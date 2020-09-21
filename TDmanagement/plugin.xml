@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="TDmanagement.commands.category"
+            name="Sample Category">
+      </category>
+      <command
+            categoryId="TDmanagement.commands.category"
+            name="Scan Selected Project"
+            id="TDmanagement.commands.sampleCommand">
+      </command>
+      <command
+            categoryId="TDmanagement.commands.category"
+            name="Load Last Analysis Project"
+            id="TDmanagement.commands.LoadLastCommand">
+      </command>
+      <command
+            categoryId="TDmanagement.commands.category"
+            name="Delete Project Analysis"
+            id="TDmanagement.commands.DeleteCommand">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="tdmanagement.handlers.SampleHandler"
+            commandId="TDmanagement.commands.sampleCommand">
+      </handler>
+      <handler
+            class="tdmanagement.handlers.LoadLastHandler"
+            commandId="TDmanagement.commands.LoadLastCommand">
+      </handler>
+      <handler
+            class="tdmanagement.handlers.DeleteHandler"
+            commandId="TDmanagement.commands.DeleteCommand">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="TDmanagement.commands.sampleCommand"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+6">
+      </key>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="TDmanagement.TDToolbar">
+            <command
+                  id="TDmanagement.toolbars.sampleCommand"
+                  commandId="TDmanagement.commands.sampleCommand"
+                  icon="icons/sample.png"
+                  tooltip="Scan Selected Project">
+            </command>
+            <command
+                  id="TDmanagement.toolbars.loadCommand"
+                  commandId="TDmanagement.commands.LoadLastCommand"
+                  icon="icons/previous.png"
+                  tooltip="Load Last Analysis">
+            </command>
+            <command
+                  id="TDmanagement.toolbars.deleteCommand"
+                  commandId="TDmanagement.commands.DeleteCommand"
+                  icon="icons/delete.png"
+                  tooltip="Delete Analysis">
+            </command>
+         </toolbar>
+      </menuContribution>
+      
+      <menuContribution
+			allPopups="false"
+			locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
+		
+			<menu
+				label="TD Management"
+				id="TD_Management.menu">
+				
+			<command
+				commandId="TDmanagement.commands.sampleCommand"
+				label="Scan Project">
+			</command>
+			<command
+				commandId="TDmanagement.commands.LoadLastCommand"
+				label="Load last analysis">
+			</command>
+			<command
+				commandId="TDmanagement.commands.DeleteCommand"
+				label="Delete Analysis">
+			</command>
+			
+			</menu>
+	</menuContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="TD Management"
+            id="TDmanagement">
+      </category>
+      <view
+            id="tdmanagement.views.SampleView"
+            name="Metrics"
+            icon="icons/sample.png"
+            class="tdmanagement.views.MetricsView"
+            category="TDmanagement"
+            inject="true">
+      </view>
+      <view
+            category="TDmanagement"
+            class="tdmanagement.views.RefactoringsView"
+            icon="icons/sample.png"
+            id="tdmanagement.views.RefactoringsView"
+            inject="true"
+            name="Refactorings View">
+      </view>
+      <view
+            category="TDmanagement"
+            class="tdmanagement.views.OpportunitiesView"
+            icon="icons/sample.png"
+            id="tdmanagement.views.OpportunitiesView"
+            inject="true"
+            name="Opportunities View">
+      </view>
+      <view
+            category="TDmanagement"
+            class="tdmanagement.views.ChartView"
+            icon="icons/sample.png"
+            id="tdmanagement.views.ChartView"
+            inject="true"
+            name="Chart View">
+      </view>
+      <view
+            category="TDmanagement"
+            class="tdmanagement.views.Forecasting"
+            icon="icons/sample.png"
+            id="tdmanagement.views.Forecasting"
+            inject="true"
+            name="Forecasting">
+      </view>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="tdmanagement.preferences.PreferencePage"
+            id="tdmanagement.preferences.PreferencePage"
+            name="TD Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="tdmanagement.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   
+   
+<extension point="org.eclipse.core.resources.markers"
+			  id="com.ibm.mymarkers.mymarker"
+  name="TD Marker">
+    <super type="org.eclipse.core.resources.textmarker"/>
+    <super type="org.eclipse.core.resources.marker"/>
+    <persistent value="true"/>
+</extension>
+
+<extension point="org.eclipse.ui.editors.markerAnnotationSpecification"
+        	  id="myannotationspecification"
+        	  name="MyAnnotation">
+    <specification annotationType="com.ibm.example.myannotation"
+            label="MyAnnotation"
+            icon="icons/sample.png"
+            overviewRulerPreferenceKey="clruler"
+            overviewRulerPreferenceValue="true"
+            colorPreferenceKey="clcolor"
+            colorPreferenceValue="255,255,0"
+            textPreferenceKey="cltext"
+            textPreferenceValue="true"
+            verticalRulerPreferenceKey="clvertical"
+            verticalRulerPreferenceValue="true"
+            textStylePreferenceKey="clstyle"
+            textStylePreferenceValue="BOX">
+    </specification>
+</extension>
+
+<extension point="org.eclipse.ui.editors.annotationTypes">
+                <type markerSeverity="0"
+                      super="org.eclipse.ui.workbench.texteditor.info"
+                      name="com.ibm.example.myannotation"
+                      markerType="com.ibm.mymarkers.mymarker"/>
+                <type markerSeverity="1"
+                      super="org.eclipse.ui.workbench.texteditor.warning"
+                      name="com.ibm.example.myannotation"
+                      markerType="com.ibm.mymarkers.mymarker"/>
+                <type markerSeverity="2"
+                      super="org.eclipse.ui.workbench.texteditor.error"
+                      name="com.ibm.example.myannotation"
+                      markerType="com.ibm.mymarkers.mymarker"/>
+</extension>
+
+<extension
+      point="org.eclipse.help.toc">
+   <toc
+         file="html/toc.xml"
+         primary="true">
+   </toc>
+   <toc
+         file="html/tocgettingstarted.xml">
+   </toc>
+</extension>
+
+<extension
+      point="org.eclipse.ui.perspectives">
+   <perspective
+         class="tdmanagement.perspectives.PerspectiveTD"
+         id="TDmanagement.TDManagement"
+         icon="icons/sample.png"
+         name="TD Management">
+   </perspective>
+</extension>
+
+</plugin>

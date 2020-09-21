@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TDmanagement
+Bundle-SymbolicName: TDmanagement;singleton:=true
+Bundle-Version: 1.0.0.202009201327
+Bundle-Activator: tdmanagement.Activator
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.core
+ .resources;bundle-version="3.13.700",org.eclipse.ui.ide;bundle-version=
+ "3.17.0",org.eclipse.core.filesystem;bundle-version="1.7.700",org.eclip
+ se.ui.workbench.texteditor;bundle-version="3.14.100",org.eclipse.jface.
+ text;bundle-version="3.16.200",org.eclipse.help.ui;bundle-version="4.1.
+ 800"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: TDmanagement
+Import-Package: javax.inject
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: libs/jfreechart-1.5.0.jar,libs/json-simple-1.1.1.jar,.
+

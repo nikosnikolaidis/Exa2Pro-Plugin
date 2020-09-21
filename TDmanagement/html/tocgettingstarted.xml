@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="TD Management for Exascale projects" link_to="html/toc.xml#gettingstarted"> 
+	<topic label="Overview"  href="html/gettingstarted/overview.html"/>
+	<topic label="User Guide">
+		<topic label="Preferences" href="html/gettingstarted/preferences.html" />
+		<topic label="Perspective" href="html/gettingstarted/perspective.html" />
+		<topic label="New-Load-Delete Analysis" href="html/gettingstarted/analysis.html" />
+		<topic label="Views">
+			<topic label="Metrics-Refactorings" href="html/gettingstarted/v-metrics-refactoring.html" />
+			<topic label="Opportunities" href="html/gettingstarted/v-opportunities.html" />
+			<topic label="Chart" href="html/gettingstarted/v-chart.html" />
+			<topic label="Markers" href="html/gettingstarted/v-markers.html" />
+		</topic>
+	</topic>
+</toc>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="TD Management" topic="html/toc.html">
+   <topic label="TD Management for Exascale projects">
+      <anchor id="gettingstarted"/>
+   </topic>
+</toc>
