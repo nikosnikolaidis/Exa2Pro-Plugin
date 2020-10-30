@@ -45,6 +45,7 @@ public class PerspectiveTD implements IPerspectiveFactory{
         IFolderLayout leftTop =
         		layout.createFolder("leftTop", IPageLayout.TOP, 0.4f, "leftMid");
         leftTop.addView("tdmanagement.views.ChartView");
+        leftTop.addView("tdmanagement.views.Forecasting");
         
         IFolderLayout leftLeftTop =
                 layout.createFolder("leftLeftTop", IPageLayout.LEFT, 0.4f, "leftTop");

@@ -5,6 +5,7 @@
  */
 package exa2pro;
 
+//import panels_frames.HomeFrame;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,11 +42,11 @@ public class Exa2Pro {
         getProjetsFromFile();
         getSettingFromFile();
 
-//        if(isWindows())
-//            sonarScannerPath= System.getProperty("user.dir") + "\\sonar-scanner-4.2-windows\\bin\\sonar-scanner.bat";
-//        else
-//            sonarScannerPath= System.getProperty("user.dir")+ "/sonar-scanner-4.2-linux/bin/sonar-scanner";
-//        
+        if(isWindows())
+            sonarScannerPath= System.getProperty("user.dir") + "\\sonar-scanner-4.2-windows\\bin\\sonar-scanner.bat";
+        else
+            sonarScannerPath= System.getProperty("user.dir")+ "/sonar-scanner-4.2-linux/bin/sonar-scanner";
+        
 //        HomeFrame homeFrame = new HomeFrame();
 //        homeFrame.setVisible(true);
     }

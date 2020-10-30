@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +20,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import parsers.CodeFile;
+import parsers.fortranFile;
 
 /**
  *
@@ -27,6 +30,7 @@ import org.json.simple.parser.ParseException;
 public class Report  implements Serializable{
     private Project project;
     private ArrayList<Issue> issuesList= new ArrayList<>();
+    private HashMap<String,Integer> tdOfEachFile= new HashMap<>();
     private Date date;
     private String totalDebt;
     private double totalDebt_Index;
@@ -34,6 +38,7 @@ public class Report  implements Serializable{
     private int totalLinesOfCode;
     private String linesOfCodeForAllLanguages;
     private int totalComplexity;
+    private int newLinesOfCode=0;
     
     public Report(Project project){
         this.project=project;
@@ -47,6 +52,129 @@ public class Report  implements Serializable{
             }
         }
         return false;
+    }
+    
+    /**
+     * get TD of each File
+     */
+    public void getTDLinesOfFilesFromSonarQube(){
+        try{
+            URL urlTry = new URL(Exa2Pro.sonarURL+"/api/measures/component?component="
+                        +project.getCredentials().getProjectName()+"&metricKeys=sqale_index");
+                HttpURLConnection connTry = (HttpURLConnection)urlTry.openConnection();
+                connTry.setRequestMethod("GET");
+                connTry.connect();
+                int responsecodeTry = connTry.getResponseCode();
+                if(responsecodeTry==200){
+                    //for each file
+                    for(CodeFile cf: project.getprojectFiles()){
+                        //get file name
+                        String parentDir= project.getCredentials().getProjectDirectory();
+                        String fileNameForSave=cf.file.getName();
+                        String fileName;
+                        if(cf instanceof fortranFile){
+                            fileName= "temp_fortran_" +cf.file.getParentFile().getName()+ "_";
+                        }
+                        else {
+                            fileName= cf.file.getParent().replace(parentDir.replace("//", ""), "");
+                            if(!fileName.equals("")) {
+                                    fileName= fileName.replace("\\", "/").substring(1).replace(" ", "%20") + "/";
+                            }
+                        }
+                        fileName= project.getCredentials().getProjectName()+":"+fileName+cf.file.getName();
+
+                        //get metric new lines
+                        getNewLinesOfCodeFromSonarQube(fileName);
+
+                        //get metric TD
+                        int metric= 0;
+                        try {
+                            URL url = new URL(Exa2Pro.sonarURL+"/api/measures/component?component="
+                                    +fileName+"&metricKeys=sqale_index");
+                            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                            conn.setRequestMethod("GET");
+                            conn.connect();
+                            int responsecode = conn.getResponseCode();
+                            if(responsecode != 200)
+                                    System.err.println(responsecode+ " "+Exa2Pro.sonarURL+"/api/measures/component?component="
+                                    +fileName+"&metricKeys=sqale_index");
+            //                    throw new RuntimeException("HttpResponseCode: "+responsecode);
+                            else{
+                                Scanner sc = new Scanner(url.openStream());
+                                String inline="";
+                                while(sc.hasNext()){
+                                    inline+=sc.nextLine();
+                                }
+                                sc.close();
+
+                                JSONParser parse = new JSONParser();
+                                JSONObject jobj = (JSONObject)parse.parse(inline);
+                                JSONObject jobj1= (JSONObject) jobj.get("component");
+                                JSONArray jsonarr_1 = (JSONArray) jobj1.get("measures");
+
+                                if(!jsonarr_1.isEmpty()){
+                                    JSONObject jsonobj_1 = (JSONObject)jsonarr_1.get(0);
+                                    metric= Integer.parseInt(jsonobj_1.get("value").toString());
+                                }
+                            }
+                        } catch (MalformedURLException ex) {
+                            Logger.getLogger(Report.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException | ParseException ex) {
+                            Logger.getLogger(Report.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        tdOfEachFile.put(fileNameForSave, metric);
+                        System.out.println("file: "+fileNameForSave+ "  td: "+metric);
+                    }
+                }
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(Report.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Report.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    /**
+     * Return the new lines of code
+     */
+    public void getNewLinesOfCodeFromSonarQube(String file){
+        try {
+            URL url = new URL(Exa2Pro.sonarURL+"/api/measures/component?component="
+                            +file+"&metricKeys=new_lines");
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.connect();
+            int responsecode = conn.getResponseCode();
+            if(responsecode != 200) {
+            	System.err.println(responsecode+" "+ Exa2Pro.sonarURL+"/api/measures/component?component="
+                            +file+"&metricKeys=new_lines");
+            	//throw new RuntimeException("HttpResponseCode: "+responsecode);
+            }
+            else{
+                Scanner sc = new Scanner(url.openStream());
+                String inline="";
+                while(sc.hasNext()){
+                    inline+=sc.nextLine();
+                }
+                sc.close();
+
+                JSONParser parse = new JSONParser();
+                JSONObject jobj = (JSONObject)parse.parse(inline);
+                JSONObject jobj1= (JSONObject) jobj.get("component");
+                JSONArray jsonarr_1 = (JSONArray) jobj1.get("measures");
+
+                if(!jsonarr_1.isEmpty()) {
+                    JSONObject jsonobj_1 = (JSONObject)jsonarr_1.get(0);
+                    JSONArray jsonarr_2 = (JSONArray) jsonobj_1.get("periods");
+                    JSONObject jsonobj_2 = (JSONObject)jsonarr_2.get(0);
+                    
+                    newLinesOfCode+= Integer.parseInt(jsonobj_2.get("value").toString());
+                }
+            }
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(Report.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | ParseException ex) {
+            Logger.getLogger(Report.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
@@ -285,6 +413,12 @@ public class Report  implements Serializable{
     public String getLinesOfCodeForAllLanguages() {
         return linesOfCodeForAllLanguages;
     }
+    public int getNewLinesOfCode() {
+        return newLinesOfCode;
+    }
+    public void setTdOfEachFile(HashMap<String, Integer> tdOfEachFile) {
+        this.tdOfEachFile = tdOfEachFile;
+    }
 
     // Setters
     public void setTotalDebt(String totalDebt) {
@@ -304,5 +438,11 @@ public class Report  implements Serializable{
     }
     public void setTotalComplexity(int totalComplexity) {
         this.totalComplexity = totalComplexity;
+    }
+    public void setNewLinesOfCode(int newLinesOfCode) {
+        this.newLinesOfCode = newLinesOfCode;
+    }
+    public HashMap<String, Integer> getTdOfEachFile() {
+        return tdOfEachFile;
     }
 }

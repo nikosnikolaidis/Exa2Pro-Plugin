@@ -122,7 +122,7 @@ public class OpportunitiesView extends ViewPart {
 
 		colMethodName = new TableViewerColumn(viewer, SWT.NONE);
 		colMethodName.getColumn().setWidth(200);
-		colMethodName.getColumn().setText("Method-Function");
+		colMethodName.getColumn().setText("Procdure");
 		colMethodName.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {

@@ -58,10 +58,10 @@ public class PieChart extends ApplicationFrame {
                     total++;
                 }
             }
-            else if (metric.equals("LCOL")){
-                System.out.println("LCOL threshold: "+threshold);
+            else if (metric.equals("LOC")){
+                System.out.println("LOC threshold: "+threshold);
                 for(CodeFile cf: project.getprojectFiles()){
-                    if(cf.cohesion>threshold)
+                    if(cf.totalLines>threshold)
                         n++;
                     else
                         p++;
@@ -92,11 +92,11 @@ public class PieChart extends ApplicationFrame {
                     }
                 }
             }
-            else if (metric.equals("LOC")){
-                System.out.println("LOC threshold: "+threshold);
+            else if (metric.equals("LCOL")){
+                System.out.println("LCOL threshold: "+threshold);
                 for(CodeFile cf: project.getprojectFiles()){
-                    for (HashMap.Entry pair : cf.methodsLOC.entrySet()) {
-                        if((Integer)pair.getValue()>threshold)
+                    for (HashMap.Entry pair : cf.methodsLCOL.entrySet()) {
+                        if((Double)pair.getValue()>threshold)
                             n++;
                         else
                             p++;
@@ -116,34 +116,27 @@ public class PieChart extends ApplicationFrame {
     * Calculate Thresholds
     */
     public static HashMap<String, Double> calculateThresholds(){
-        int sumFO=0;
         ArrayList<Integer> FO=new ArrayList<>();
-        int sumCo=0;
-        ArrayList<Double> Co=new ArrayList<>();
-        int sumCC=0;
+        //ArrayList<Double> Co=new ArrayList<>();
         ArrayList<Integer> CC=new ArrayList<>();
-        int sumLOC=0;
-        ArrayList<Integer> LOC=new ArrayList<>();
+        ArrayList<Double> procLCOL=new ArrayList<>();
+//        ArrayList<Integer> LOC=new ArrayList<>();
+        ArrayList<Integer> FileLOC=new ArrayList<>();
         ArrayList<Integer> LCOP=new ArrayList<>();
-        int totalfiles=0;
-        int totalmethods=0;
         for(ProjectCredentials pC: Exa2Pro.projecCredentialstList){
             Project p= pC.getProjects().get(pC.getProjects().size()-1);
             for(CodeFile cf: p.getprojectFiles()){
-                sumFO += cf.fanOut;
                 FO.add(cf.fanOut);
-                sumCo += cf.cohesion;
-                Co.add(cf.cohesion);
+                //Co.add(cf.cohesion);
                 if(cf.lcop!=-1)
                     LCOP.add(cf.lcop);
-                totalfiles++;
                 for(String key : cf.methodsLOC.keySet()){
-                    sumCC += cf.methodsCC.get(key);
                     CC.add(cf.methodsCC.get(key));
-                    sumLOC += cf.methodsLOC.get(key);
-                    LOC.add(cf.methodsLOC.get(key));
-                    totalmethods++;
+                    //LOC.add(cf.methodsLOC.get(key));
+                    if(cf.methodsLCOL.containsKey(key.split(" ")[key.split(" ").length-1]))
+                    	procLCOL.add(cf.methodsLCOL.get(key.split(" ")[key.split(" ").length-1]));
                 }
+                FileLOC.add(cf.totalLines);
             }
         }
         HashMap<String, Double> temp=new HashMap<>();
@@ -153,20 +146,29 @@ public class PieChart extends ApplicationFrame {
 //        temp.put("LOC", (sumLOC*1.0)/totalmethods);
         
         Collections.sort(FO);
-        Collections.sort(Co);
+        //Collections.sort(Co);
         Collections.sort(CC);
-        Collections.sort(LOC);
+        //Collections.sort(LOC);
+        Collections.sort(procLCOL);
+        Collections.sort(FileLOC);
         Collections.sort(LCOP);
         int f= (int) Math.floor(FO.size()*0.9);
-        int c= (int) Math.floor(Co.size()*0.9);
+        //int c= (int) Math.floor(Co.size()*0.9);
         int m= (int) Math.floor(CC.size()*0.9);
-        int l= (int) Math.floor(LOC.size()*0.9);
+        //int l= (int) Math.floor(LOC.size()*0.9);
+        int cProc= (int) Math.floor(procLCOL.size()*0.9);
+        int lFile= (int) Math.floor(FileLOC.size()*0.9);
         int l1= (int) Math.floor(LCOP.size()*0.9);
         temp.put("FanOut", 1.0*FO.get(f));
-        temp.put("LCOL", 1.0*Co.get(c));
+        //temp.put("LCOL", 1.0*Co.get(c));
+        temp.put("LCOL", 1.0*procLCOL.get(cProc));
         temp.put("CC", 1.0*CC.get(m));
-        temp.put("LOC", 1.0*LOC.get(l));
-        temp.put("LCOP", 1.0*LCOP.get(l1));
+        //temp.put("LOC", 1.0*LOC.get(l));
+        temp.put("LOC", 1.0*FileLOC.get(lFile));
+        if(!LCOP.isEmpty())
+            temp.put("LCOP", 1.0*LCOP.get(l1));
+        else
+            temp.put("LCOP", 0.0);
         
         return temp;
     }

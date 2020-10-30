@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import parsers.CodeFile;
+import parsers.fortranFile;
 
 /**
  *
@@ -77,11 +78,11 @@ public class Analysis {
 
             writer.append("sonar.sources=." + System.lineSeparator());
 
+            writer.append("sonar.sourceEncoding=UTF-8"+ System.lineSeparator());
             if(project.containsFortran()){
                 writer.append("sonar.icode.launch=true" +System.lineSeparator());
                 writer.append("sonar.icode.path="+ Exa2Pro.iCodePath.replace("\\", "\\\\") +System.lineSeparator());
             }
-            //writer.append("sonar.sourceEncoding=UTF-8");
             writer.close();
         } catch (IOException ex) {
             Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
@@ -98,30 +99,33 @@ public class Analysis {
         //FanOut from invocations
         //for each file
         for (CodeFile file : project.getprojectFiles()) {
-            HashSet<String> fanOutFiles= new HashSet<>();
-            //for each invocation
-            for (Map.Entry<String, String> entry : file.methodInvocations.entrySet()) {
-                //check if not in same file
-                boolean methodMine= false;
-                for (Map.Entry<String, Integer> entry2 : file.methodsLOC.entrySet()) {
-                    if(entry.getKey().equalsIgnoreCase(entry2.getKey())){
-                        methodMine= true;
+            if(file instanceof fortranFile){
+                HashSet<String> fanOutFiles= new HashSet<>();
+                //for each invocation
+                for (String entry : file.methodInvocations) {
+                    String[] table= entry.split(";",2);
+                    //check if not in same file
+                    boolean methodMine= false;
+                    for (Map.Entry<String, Integer> entry2 : file.methodsLOC.entrySet()) {
+                        if(table[0].equalsIgnoreCase(entry2.getKey())){
+                            methodMine= true;
+                        }
                     }
-                }
-                //check in every other file the methods
-                if(!methodMine){
-                    for (CodeFile file2 : project.getprojectFiles()) {
-                        for (Map.Entry<String, Integer> entry2 : file2.methodsLOC.entrySet()) {
-                            if(entry.getKey().equalsIgnoreCase(entry2.getKey()) 
-                                        || entry.getKey().equalsIgnoreCase(entry2.getKey().replaceAll("static|void", "").trim())){
-                                fanOutFiles.add(file2.file.getName());
+                    //check in every other file the methods
+                    if(!methodMine){
+                        for (CodeFile file2 : project.getprojectFiles()) {
+                            for (Map.Entry<String, Integer> entry2 : file2.methodsLOC.entrySet()) {
+                                if(table[0].equalsIgnoreCase(entry2.getKey()) 
+                                            || table[0].equalsIgnoreCase(entry2.getKey().replaceAll("static|void", "").trim())){
+                                    fanOutFiles.add(file2.file.getName());
+                                }
                             }
                         }
                     }
                 }
+                //fanOut update
+                file.fanOut+= fanOutFiles.size();
             }
-            //fanOut update
-            file.fanOut+= fanOutFiles.size();
         }
         
         //FanOut from common blocks
@@ -236,6 +240,7 @@ public class Analysis {
             report.setLinesOfCodeForAllLanguages(report.getMetricFromSonarQube("ncloc_language_distribution").replace(";", "\n"));
             
             report.getIssuesFromSonarQube();
+            report.getTDLinesOfFilesFromSonarQube();
         } catch (InterruptedException | IOException ex) {
             Logger.getLogger(Analysis.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -300,6 +305,7 @@ public class Analysis {
             report.setLinesOfCodeForAllLanguages(report.getMetricFromSonarQube("ncloc_language_distribution").replace(";", "\n"));
             
             report.getIssuesFromSonarQube();
+            report.getTDLinesOfFilesFromSonarQube();
         } catch (Exception e) {
             e.printStackTrace();
         }

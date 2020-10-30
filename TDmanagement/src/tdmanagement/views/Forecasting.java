@@ -31,8 +31,6 @@ public class Forecasting extends ViewPart{
 	private static Frame frame;
 	
 	public static Project project;
-	
-	private static javax.swing.JPanel jPanelChart;
 
 	
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -57,15 +55,9 @@ public class Forecasting extends ViewPart{
 	}
 	
 	public static void build() {
-		
+		frame.add(new JPanelForecasting(project));
 	}
 	
-	
-	private void showMessage(String message) {
-		MessageDialog.openInformation(composite.getShell(),
-			"Chart View",
-			message);
-	}
 
 	@Override
 	public void setFocus() {

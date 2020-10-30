@@ -56,27 +56,27 @@ public class RefactoringsView extends ViewPart {
 	IWorkbench workbench;
 
 	private static TableViewer viewer;
-	private Action action1FO;
-	private Action action2Coh;
+	private Action action1CBF;
+	private Action action2LOC;
 	private Action action2LCOP;
 	private Action action3CC;
-	private Action action4LOC;
+	private Action action4LCOL;
 	private Action doubleClickAction;
 
 	// all columns
 	static TableViewerColumn colFileName;
-	static TableViewerColumn colFanOut;
-	static TableViewerColumn colCohesion;
+	static TableViewerColumn colCBF;
+	static TableViewerColumn colLOC;
 	static TableViewerColumn colLCOP;
 	static TableViewerColumn colMethodName;
 	static TableViewerColumn colCC;
-	static TableViewerColumn colLOC;
+	static TableViewerColumn colLCOL;
 
 	public static HashMap<String, Double> arrayCC = new HashMap<String, Double>();
+	public static HashMap<String, Double> arrayLCOL = new HashMap<String, Double>();
 	public static HashMap<String, Double> arrayLOC = new HashMap<String, Double>();
-	public static HashMap<String, Double> arrayCoh = new HashMap<String, Double>();
 	public static HashMap<String, Double> arrayLCOP = new HashMap<String, Double>();
-	public static HashMap<String, Double> arrayFO = new HashMap<String, Double>();
+	public static HashMap<String, Double> arrayCBF = new HashMap<String, Double>();
 
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		@Override
@@ -123,17 +123,17 @@ public class RefactoringsView extends ViewPart {
 			colMethodName.getColumn().dispose();
 			colCC.getColumn().dispose();
 		}
-		if (colLOC != null) {
+		if (colLCOL != null) {
 			colMethodName.getColumn().dispose();
+			colLCOL.getColumn().dispose();
+		}
+		if (colCBF != null) {
+			colFileName.getColumn().dispose();
+			colCBF.getColumn().dispose();
+		}
+		if (colLOC != null) {
+			colFileName.getColumn().dispose();
 			colLOC.getColumn().dispose();
-		}
-		if (colFanOut != null) {
-			colFileName.getColumn().dispose();
-			colFanOut.getColumn().dispose();
-		}
-		if (colCohesion != null) {
-			colFileName.getColumn().dispose();
-			colCohesion.getColumn().dispose();
 		}
 		if(colLCOP != null) {
 			colFileName.getColumn().dispose();
@@ -145,7 +145,7 @@ public class RefactoringsView extends ViewPart {
 	/**
 	 * Adds columns for file metrics FanOut and sets all the files to the table
 	 */
-	public static void addElementsToTableFileFanOut() {
+	public static void addElementsToTableFileCBF() {
 		colFileName = new TableViewerColumn(viewer, SWT.NONE);
 		colFileName.getColumn().setWidth(200);
 		colFileName.getColumn().setText("File");
@@ -156,10 +156,10 @@ public class RefactoringsView extends ViewPart {
 				return temp.getName();
 			}
 		});
-		colFanOut = new TableViewerColumn(viewer, SWT.NONE);
-		colFanOut.getColumn().setWidth(100);
-		colFanOut.getColumn().setText("FanOut");
-		colFanOut.setLabelProvider(new ColumnLabelProvider() {
+		colCBF = new TableViewerColumn(viewer, SWT.NONE);
+		colCBF.getColumn().setWidth(100);
+		colCBF.getColumn().setText("CBF");
+		colCBF.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				TempMethodOneMetric temp = (TempMethodOneMetric) element;
@@ -167,8 +167,8 @@ public class RefactoringsView extends ViewPart {
 			}
 		});
 
-		for (String key : arrayFO.keySet()) {
-			TempMethodOneMetric tM = new TempMethodOneMetric(key, arrayFO.get(key));
+		for (String key : arrayCBF.keySet()) {
+			TempMethodOneMetric tM = new TempMethodOneMetric(key, arrayCBF.get(key));
 			viewer.add(tM);
 		}
 	}
@@ -176,7 +176,7 @@ public class RefactoringsView extends ViewPart {
 	/**
 	 * Adds columns for file metrics Cohesion and sets all the files to the table
 	 */
-	public static void addElementsToTableFileCohesion() {
+	public static void addElementsToTableFileLOC() {
 		colFileName = new TableViewerColumn(viewer, SWT.NONE);
 		colFileName.getColumn().setWidth(200);
 		colFileName.getColumn().setText("File");
@@ -188,10 +188,10 @@ public class RefactoringsView extends ViewPart {
 			}
 		});
 
-		colCohesion = new TableViewerColumn(viewer, SWT.NONE);
-		colCohesion.getColumn().setWidth(100);
-		colCohesion.getColumn().setText("Cohesion");
-		colCohesion.setLabelProvider(new ColumnLabelProvider() {
+		colLOC = new TableViewerColumn(viewer, SWT.NONE);
+		colLOC.getColumn().setWidth(100);
+		colLOC.getColumn().setText("LOC");
+		colLOC.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				TempMethodOneMetric temp = (TempMethodOneMetric) element;
@@ -199,8 +199,8 @@ public class RefactoringsView extends ViewPart {
 			}
 		});
 
-		for (String key : arrayCoh.keySet()) {
-			TempMethodOneMetric tM = new TempMethodOneMetric(key, arrayCoh.get(key));
+		for (String key : arrayLOC.keySet()) {
+			TempMethodOneMetric tM = new TempMethodOneMetric(key, arrayLOC.get(key));
 			viewer.add(tM);
 		}
 	}
@@ -284,10 +284,10 @@ public class RefactoringsView extends ViewPart {
 				return temp.getName();
 			}
 		});
-		colLOC = new TableViewerColumn(viewer, SWT.NONE);
-		colLOC.getColumn().setWidth(100);
-		colLOC.getColumn().setText("LOC");
-		colLOC.setLabelProvider(new ColumnLabelProvider() {
+		colLCOL = new TableViewerColumn(viewer, SWT.NONE);
+		colLCOL.getColumn().setWidth(100);
+		colLCOL.getColumn().setText("LCOL");
+		colLCOL.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				TempMethodOneMetric temp = (TempMethodOneMetric) element;
@@ -295,8 +295,8 @@ public class RefactoringsView extends ViewPart {
 			}
 		});
 
-		for (String key : arrayLOC.keySet()) {
-			TempMethodOneMetric tM = new TempMethodOneMetric(key, arrayLOC.get(key));
+		for (String key : arrayLCOL.keySet()) {
+			TempMethodOneMetric tM = new TempMethodOneMetric(key, arrayLCOL.get(key));
 			viewer.add(tM);
 		}
 	}
@@ -305,28 +305,28 @@ public class RefactoringsView extends ViewPart {
 	 * Set action1, action2, action3 and action4
 	 */
 	private void makeActions() {
-		action1FO = new Action() {
+		action1CBF = new Action() {
 			public void run() {
 				removePrev();
 				// add new columns and data
-				addElementsToTableFileFanOut();
+				addElementsToTableFileCBF();
 			}
 		};
-		action1FO.setText("FanOut Files");
-		action1FO.setToolTipText("See FanOut Files need Refactoring");
-		action1FO.setImageDescriptor(
+		action1CBF.setText("(CBF) Over Coupled File/Modules");
+		action1CBF.setToolTipText("See Over Coupled Files/Modules in need of Refactoring");
+		action1CBF.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
 
-		action2Coh = new Action() {
+		action2LOC = new Action() {
 			public void run() {
 				removePrev();
 				// add new columns and data
-				addElementsToTableFileCohesion();
+				addElementsToTableFileLOC();
 			}
 		};
-		action2Coh.setText("Cohesion(LCOL) Files");
-		action2Coh.setToolTipText("See Cohesion(LCOL) Files need Refactoring");
-		action2Coh.setImageDescriptor(
+		action2LOC.setText("(LOC) Large Files/Modules");
+		action2LOC.setToolTipText("See Large Files/Modules in need of Refactoring");
+		action2LOC.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
 		
 		action2LCOP = new Action() {
@@ -336,8 +336,8 @@ public class RefactoringsView extends ViewPart {
 				addElementsToTableFileLCOP();
 			}
 		};
-		action2LCOP.setText("Cohesion(LCOP) Files");
-		action2LCOP.setToolTipText("See Cohesion(LCOP) Files need Refactoring");
+		action2LCOP.setText("(LCOP) Large Files/Modules");
+		action2LCOP.setToolTipText("See Large Files/Modules in need of Refactoring");
 		action2LCOP.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
 
@@ -348,24 +348,24 @@ public class RefactoringsView extends ViewPart {
 				addElementsToTableMethodsCC();
 			}
 		};
-		action3CC.setText("CC Method/Function");
-		action3CC.setToolTipText("See CC Method/Function need Refactoring");
+		action3CC.setText("(CC) Complex Procedures");
+		action3CC.setToolTipText("See Complex Procedures in need of Refactoring");
 		action3CC.setImageDescriptor(workbench.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
 
-		action4LOC = new Action() {
+		action4LCOL = new Action() {
 			public void run() {
 				removePrev();
 				// add new columns and data
 				addElementsToTableMethodsLOC();
 			}
 		};
-		action4LOC.setText("LOC Method/Function Metrics");
-		action4LOC.setToolTipText("See LOC Method/Function need Refactoring");
-		action4LOC.setImageDescriptor(workbench.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		action4LCOL.setText("(LCOL) Long Procedures");
+		action4LCOL.setToolTipText("See Long Procedures in need of Refactoring");
+		action4LCOL.setImageDescriptor(workbench.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
 
 		doubleClickAction = new Action() {
 			public void run() {
-				if (colCohesion != null) {
+				if (colLCOL != null) {
 					// show message
 					IStructuredSelection selection = viewer.getStructuredSelection();
 					Object obj = selection.getFirstElement();
@@ -383,7 +383,7 @@ public class RefactoringsView extends ViewPart {
 					// calculate Opportunities
 					CodeFile temp = null;
 					for (CodeFile cf : projectFiles) {
-						if (obj.toString().equals(cf.file.getName())) {
+						if ((obj.toString().split("\\.")[0]+"."+obj.toString().split("\\.")[1]).equals(cf.file.getName())) {
 							temp = cf;
 						}
 					}
@@ -430,23 +430,23 @@ public class RefactoringsView extends ViewPart {
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		manager.add(action1FO);
-		manager.add(action2Coh);
+		manager.add(action1CBF);
+		manager.add(action2LOC);
 		manager.add(action2LCOP);
 		manager.add(new Separator());
 		manager.add(action3CC);
-		manager.add(action4LOC);
+		manager.add(action4LCOL);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(action1FO);
-		manager.add(action2Coh);
+		manager.add(action1CBF);
+		manager.add(action2LOC);
 		manager.add(action2LCOP);
 		manager.add(new Separator());
 		manager.add(action3CC);
-		manager.add(action4LOC);
+		manager.add(action4LCOL);
 		manager.add(new Separator());
 	}
 

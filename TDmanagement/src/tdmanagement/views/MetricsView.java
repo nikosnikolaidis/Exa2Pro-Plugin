@@ -52,12 +52,12 @@ public class MetricsView extends ViewPart {
 	
 	//all columns
 	static TableViewerColumn colFileName;
-	static TableViewerColumn colFanOut;
-	static TableViewerColumn colCohesion;
+	static TableViewerColumn colCBF;
+	static TableViewerColumn colLOC;
 	static TableViewerColumn colLCOP;
 	static TableViewerColumn colMethodName;
 	static TableViewerColumn colCC;
-	static TableViewerColumn colLOC;
+	static TableViewerColumn colLCOL;
 	
 	public static ArrayList<CodeFile> array=new ArrayList<CodeFile>();
 	
@@ -104,12 +104,12 @@ public class MetricsView extends ViewPart {
 		if(colMethodName!=null) {
 			colMethodName.getColumn().dispose();
 			colCC.getColumn().dispose();
-			colLOC.getColumn().dispose();
+			colLCOL.getColumn().dispose();
 		}
 		if(colFileName!=null) {
 			colFileName.getColumn().dispose();
-			colFanOut.getColumn().dispose();
-			colCohesion.getColumn().dispose();
+			colCBF.getColumn().dispose();
+			colLOC.getColumn().dispose();
 			colLCOP.getColumn().dispose();
 		}
 		viewer.getTable().removeAll();
@@ -131,24 +131,25 @@ public class MetricsView extends ViewPart {
 		        return cf.file.getName();
 		    }
 		});
-		colFanOut = new TableViewerColumn(viewer, SWT.NONE);
-		colFanOut.getColumn().setWidth(100);
-		colFanOut.getColumn().setText("FanOut");
-		colFanOut.setLabelProvider(new ColumnLabelProvider() {
+		colCBF = new TableViewerColumn(viewer, SWT.NONE);
+		colCBF.getColumn().setWidth(100);
+		colCBF.getColumn().setText("CBF");
+		colCBF.setLabelProvider(new ColumnLabelProvider() {
 		    @Override
 		    public String getText(Object element) {
 		        CodeFile cf = (CodeFile) element;
 		        return cf.fanOut+"";
 		    }
 		});
-		colCohesion = new TableViewerColumn(viewer, SWT.NONE);
-		colCohesion.getColumn().setWidth(100);
-		colCohesion.getColumn().setText("LCOL");
-		colCohesion.setLabelProvider(new ColumnLabelProvider() {
+		colLOC = new TableViewerColumn(viewer, SWT.NONE);
+		colLOC.getColumn().setWidth(100);
+		colLOC.getColumn().setText("LOC");
+		colLOC.setLabelProvider(new ColumnLabelProvider() {
 		    @Override
 		    public String getText(Object element) {
 		        CodeFile cf = (CodeFile) element;
-		        return  (Math.round(cf.cohesion * 10.0)/10.0)+"";
+		        return cf.totalLines+"";
+		        //return  (Math.round(cf.cohesion * 10.0)/10.0)+"";
 		    }
 		});
 		colLCOP = new TableViewerColumn(viewer, SWT.NONE);
@@ -193,20 +194,26 @@ public class MetricsView extends ViewPart {
 		        return temp.getCC()+"";
 		    }
 		});
-		colLOC = new TableViewerColumn(viewer, SWT.NONE);
-		colLOC.getColumn().setWidth(100);
-		colLOC.getColumn().setText("LOC");
-		colLOC.setLabelProvider(new ColumnLabelProvider() {
+		colLCOL = new TableViewerColumn(viewer, SWT.NONE);
+		colLCOL.getColumn().setWidth(100);
+		colLCOL.getColumn().setText("LCOL");
+		colLCOL.setLabelProvider(new ColumnLabelProvider() {
 		    @Override
 		    public String getText(Object element) {
 		    	TempMethod temp= (TempMethod)element;
-		        return temp.getLOC()+"";
+		    	if(temp.getLCOL()!=-1)
+		    		return temp.getLCOL()+"";
+		    	return "-";
 		    }
 		});
 		
 		for(CodeFile cf: array){
             for(String key :cf.methodsLOC.keySet()){
-            	TempMethod tM=new TempMethod(cf.file.getName()+": "+key, cf.methodsCC.get(key), cf.methodsLOC.get(key));
+            	TempMethod tM;
+            	if(cf.methodsLCOL.containsKey(key))
+            		tM=new TempMethod(cf.file.getName()+": "+key, cf.methodsCC.get(key), cf.methodsLCOL.get(key));
+            	else
+            		tM=new TempMethod(cf.file.getName()+": "+key, cf.methodsCC.get(key), -1);
             	viewer.add(tM);
             }
         }

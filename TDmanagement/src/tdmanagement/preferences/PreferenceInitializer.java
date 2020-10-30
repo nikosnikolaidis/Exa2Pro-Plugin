@@ -17,8 +17,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 */
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		store.setDefault(PreferenceConstants.P_BOOLEAN, false);
-		store.setDefault(PreferenceConstants.P_BOOLEANopport, false);
+		store.setDefault(PreferenceConstants.P_BOOLEAN, true);
+		store.setDefault(PreferenceConstants.P_BOOLEANopport, true);
 		store.setDefault(PreferenceConstants.P_STRING_URL, "http://localhost:9000");
 	}
 

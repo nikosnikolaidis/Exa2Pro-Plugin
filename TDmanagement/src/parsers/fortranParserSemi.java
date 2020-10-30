@@ -370,10 +370,12 @@ public class fortranParserSemi {
             }
             
             //for each word
+            boolean foundOneCondition=false;
             for(String str: lineTable){
                 if(!str.equals("")){
                     if(!isNumeric(str)){
-                        if(Pattern.matches("if|endif|do|enddo|selectcase|endselect|case",str.toLowerCase())){
+                        if(!foundOneCondition && Pattern.matches("if|endif|do|enddo|selectcase|endselect|case",str.toLowerCase())){
+                            foundOneCondition=true;
                             //if starts
                             if(arrayIfStart.contains(countLOC)){
                                 writer.append("BEGIN_IF#"+countLOC+";"+System.lineSeparator());

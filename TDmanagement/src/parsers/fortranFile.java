@@ -1,6 +1,7 @@
 
 package parsers;
 
+import csvControlers.CSVWriteForClustering;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,7 +70,8 @@ public class fortranFile extends CodeFile{
                 if (!line.trim().equals("")){
                     String[] lineTable= line.trim().replaceAll("\\s\\s+", " ").split(" ");
                     if( !isCommentLine(lineTable[0]) ){
-                    
+                        totalLines++;
+                        
                         // For fan-out
                         //Method invocation
                         if((line.trim().toLowerCase().startsWith("call ") && !(line.toLowerCase().contains("if") || line.toLowerCase().contains("do") )) ||
@@ -81,7 +83,7 @@ public class fortranFile extends CodeFile{
                                 meth="";
                             else
                                 meth=methodsName.get(methodsName.size()-1);
-                            methodInvocations.put(callMethodSplit[0], meth);
+                            methodInvocations.add(callMethodSplit[0] +";"+ meth);
                         }
                         
                         // For fan-out
@@ -129,15 +131,7 @@ public class fortranFile extends CodeFile{
                         if(lineTable[0].equalsIgnoreCase("module") || Pattern.matches(".module", lineTable[0])){
                             module= true;
                         }
-                        
-                        if(!methodsName.isEmpty()){
-                            String[] lineVar= replaceWithSpaces(line).split(" ");
-                            for(String str: lineVar){
-                                if( attributes.contains(str.trim()) ){
-                                    attributesInMethods.add(str.trim()+" "+methodsName.get(methodsName.size()-1));
-                                }
-                            }
-                        }
+                        //attributes in methods searched after start of method
                         
                         
                         // For start count LOC in function/subroutine
@@ -161,6 +155,16 @@ public class fortranFile extends CodeFile{
                             if(lineTable.length>4 && tempCom>3){
                                 if(lineTable[3].equalsIgnoreCase("function") || lineTable[3].equalsIgnoreCase("subroutine") )
                                     methodStartsHere(checkForPreviousEnd,checkForPreviousEndLine,lineTable,4,countLOC);
+                            }
+                        }
+                        
+                        //attributes in methods
+                        if(!methodsName.isEmpty()){
+                            String[] lineVar= replaceWithSpaces(line).split(" ");
+                            for(String str: lineVar){
+                                if( attributes.contains(str.trim()) ){
+                                    attributesInMethods.add(str.trim()+" "+methodsName.get(methodsName.size()-1));
+                                }
                             }
                         }
                         
@@ -282,7 +286,8 @@ public class fortranFile extends CodeFile{
                         }
                         
                         //get all select cases
-                        if(line.toLowerCase().contains("select case(") || line.toLowerCase().contains("select case (")){
+                        if(line.toLowerCase().contains("select case(") || line.toLowerCase().contains("select case (")
+                        		|| line.toLowerCase().contains("selectcase(") || line.toLowerCase().contains("selectcase (")){
                             arraySelectCasesStart.add(countLOC);
                             if(arraySelectCasesEnd.size()+1<arraySelectCasesStart.size())
                                 arraySelectCasesEnd.add(0);
@@ -298,13 +303,14 @@ public class fortranFile extends CodeFile{
                                     if(arraySelectCasesEnd.get(i)==0)
                                         casescounter=i;
                                 }
+                                System.out.println(file.getAbsolutePath());
                                 arraySelectCasesEnd.set(casescounter, countLOC);
                             }
                         }
                         
                         //get all cases
                         if(!firstCase && caseNumber>0 && (lineTable[0].toLowerCase().contains("case(") || lineTable[0].equalsIgnoreCase("case")
-                                || line.toLowerCase().contains("end select"))){
+                                || line.toLowerCase().contains("end select") || line.toLowerCase().contains("endselect"))){
                             if(arrayCasesEnd.size()+1==arrayCasesStart.size()){
                                 arrayCasesEnd.add(countLOC);
                             }
@@ -351,6 +357,12 @@ public class fortranFile extends CodeFile{
                 methodsLOC.put(methodsName.get(i), (methodsLocStop.get(i)-methodsLocStart.get(i)-1));
                 methodsCC.put(methodsName.get(i), methodsCCArray.get(i));
             }
+            
+            
+            //export csv for attributes and invocations
+//            if(module){
+//                new CSVWriteForClustering(this);
+//            }
             
 //                System.out.println("do");
 //                for(int i=0; i<arrayDoStart.size(); i++){
@@ -453,7 +465,7 @@ public class fortranFile extends CodeFile{
         fortranSemi.parse();
         if(!fortranSemi.error){
             ParsedFilesController paFC=new ParsedFilesController();
-            this.cohesion = paFC.doAnalysisLcom(file);
+            paFC.doAnalysisLcom(this);
         }
         else
             this.cohesion=0;

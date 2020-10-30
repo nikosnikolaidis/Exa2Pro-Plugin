@@ -34,6 +34,7 @@ import exa2pro.Project;
 import exa2pro.ProjectCredentials;
 import parsers.CodeFile;
 import tdmanagement.views.ChartView;
+import tdmanagement.views.Forecasting;
 import tdmanagement.views.MetricsView;
 import tdmanagement.views.RefactoringsView;
 
@@ -108,47 +109,48 @@ public class LoadLastHandler extends AbstractHandler{
 		    	RefactoringsView.removePrev();
 		    	HashMap<String, Double> thresholds= PieChart.calculateThresholds();
 		    	//create the lists for all the methods and files
-		        HashMap<String, Double> allFilesCohesion = new HashMap<>();
-		        HashMap<String, Double> allFilesLCOP = new HashMap<>();
+		    	HashMap<String, Double> allFilesLCOP = new HashMap<>();
 		        HashMap<String, Double> allFilesFanOut = new HashMap<>();
 		        HashMap<String, Double> allMethodsCC = new HashMap<>();
-		        HashMap<String, Double> allMethodsLOC = new HashMap<>();
+		        HashMap<String, Double> allMethodsLCOL = new HashMap<>();
+		        HashMap<String, Double> allFilesLOC = new HashMap<>();
 		        for(CodeFile cf: p.getprojectFiles()){
-		            if(cf.fanOut > thresholds.get("FanOut"))
+		            if(cf.fanOut >= thresholds.get("FanOut"))
 		                allFilesFanOut.put(cf.file.getName(), (double) cf.fanOut);
-		            if(Math.round(cf.cohesion * 10.0)/10.0 > thresholds.get("LCOL"))
-		                allFilesCohesion.put(cf.file.getName(), Math.round(cf.cohesion * 10.0)/10.0);
-		            if(cf.lcop > thresholds.get("LCOP"))
+		            if(cf.lcop!=-1 && Math.round(cf.lcop * 10.0)/10.0 >= thresholds.get("LCOP"))
 		                allFilesLCOP.put(cf.file.getName(), (double) cf.lcop);
+		            if(cf.totalLines>=thresholds.get("LOC"))
+		                allFilesLOC.put(cf.file.getName(), (double) cf.totalLines);
 		            allMethodsCC.putAll(prefixHashMap(cf.methodsCC, cf.file.getName(), thresholds, "CC"));
-		            allMethodsLOC.putAll(prefixHashMap(cf.methodsLOC, cf.file.getName(), thresholds, "LOC"));
+		            allMethodsLCOL.putAll(prefixHashMap(cf.methodsLCOL, cf.file.getName(), thresholds, "LCOL"));
 		        }
 		        //sort the lists
+		      //sort the lists
 		        HashMap<String, Double> sortedCC= allMethodsCC.entrySet()
 		        .stream()
 		        .sorted(Collections.reverseOrder(HashMap.Entry.comparingByValue()))
 		        .collect(
 		            toMap(HashMap.Entry::getKey, HashMap.Entry::getValue, (e1, e2) -> e2,
 		                LinkedHashMap::new));
-		        HashMap<String, Double> sortedLOC= allMethodsLOC.entrySet()
+		        HashMap<String, Double> sortedLCOL= allMethodsLCOL.entrySet()
 		        .stream()
 		        .sorted(Collections.reverseOrder(HashMap.Entry.comparingByValue()))
 		        .collect(
 		            toMap(HashMap.Entry::getKey, HashMap.Entry::getValue, (e1, e2) -> e2,
 		                LinkedHashMap::new));
-		        HashMap<String, Double> sortedCohecion= allFilesCohesion.entrySet()
+		        HashMap<String, Double> sortedFanOut= allFilesFanOut.entrySet()
 		        .stream()
 		        .sorted(Collections.reverseOrder(HashMap.Entry.comparingByValue()))
 		        .collect(
 		            toMap(HashMap.Entry::getKey, HashMap.Entry::getValue, (e1, e2) -> e2,
 		                LinkedHashMap::new));
 		        HashMap<String, Double> sortedLCOP= allFilesLCOP.entrySet()
-		    	        .stream()
-		    	        .sorted(Collections.reverseOrder(HashMap.Entry.comparingByValue()))
-		    	        .collect(
-		    	            toMap(HashMap.Entry::getKey, HashMap.Entry::getValue, (e1, e2) -> e2,
-		    	                LinkedHashMap::new));
-		        HashMap<String, Double> sortedFanOut= allFilesFanOut.entrySet()
+		        .stream()
+		        .sorted(Collections.reverseOrder(HashMap.Entry.comparingByValue()))
+		        .collect(
+		            toMap(HashMap.Entry::getKey, HashMap.Entry::getValue, (e1, e2) -> e2,
+		                LinkedHashMap::new));
+		        HashMap<String, Double> sortedFilesLOC= allFilesLOC.entrySet()
 		        .stream()
 		        .sorted(Collections.reverseOrder(HashMap.Entry.comparingByValue()))
 		        .collect(
@@ -156,11 +158,11 @@ public class LoadLastHandler extends AbstractHandler{
 		                LinkedHashMap::new));
 		    	//add the lists
 		        RefactoringsView.arrayCC= sortedCC;
-		        RefactoringsView.arrayLOC= sortedLOC;
-		        RefactoringsView.arrayCoh= sortedCohecion;
+		        RefactoringsView.arrayLOC= sortedFilesLOC;
+		        RefactoringsView.arrayLCOL= sortedLCOL;
 		        RefactoringsView.arrayLCOP= sortedLCOP;
-		        RefactoringsView.arrayFO= sortedFanOut;
-		    	RefactoringsView.addElementsToTableFileFanOut();
+		        RefactoringsView.arrayCBF= sortedFanOut;
+		    	RefactoringsView.addElementsToTableFileCBF();
 		    	
 		    	
 		    	
@@ -213,6 +215,18 @@ public class LoadLastHandler extends AbstractHandler{
 	            catch(NullPointerException e) {
 	            	e.printStackTrace();
 	            }
+	            
+
+		    	//Forecasting View
+		    	try {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("tdmanagement.views.Forecasting");
+				} catch (PartInitException e) {
+					e.printStackTrace();
+				}
+	            
+	            Forecasting.project=p;
+	            Forecasting.build();
+	            
 		    	
 	            //Charts
 	            try {
@@ -241,8 +255,14 @@ public class LoadLastHandler extends AbstractHandler{
             HashMap.Entry entry = (HashMap.Entry) iter.next();
             Object key = entry.getKey();
             Object value = entry.getValue();
-            if(((Integer)value)*1.0 > thresholds.get(metric))
-                result.put(prefix + '.' + key.toString(), (int)value*1.0);
+            if(value instanceof Integer) {
+            	if((Integer)value >= thresholds.get(metric))
+            		result.put(prefix + '.' + key.toString(), ((Integer)value)*1.0);
+            }
+            else {
+            	if((Double)value >= thresholds.get(metric))
+            		result.put(prefix + '.' + key.toString(), (Double)value);
+            }
         }
         return result;
     }

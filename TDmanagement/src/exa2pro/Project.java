@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -139,8 +140,13 @@ public class Project implements Serializable {
                                         count++;
                                 }
                             }
+                            try {
                             Files.copy(f.toPath(), Paths.get(cf.file.getParent()+"/"+fName.split("_",count+2)[count+1]) );
                             f.delete();
+                            }
+                            catch (NoSuchFileException e) {
+								System.out.println("java.nio.file.NoSuchFileException");
+							}
                         }
                     }
                 }

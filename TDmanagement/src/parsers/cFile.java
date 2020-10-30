@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -38,6 +40,8 @@ public class cFile extends CodeFile{
             int lineContinuousParOpen=0;
             int lineContinuousParClose=0;
             ArrayList<String> includeFiles=new ArrayList<>();
+            ArrayList<String> allInvocations=new ArrayList<>();
+            String pre_Inv="";
             
             boolean methodStarted=false;
             int methodCC=0;
@@ -59,6 +63,20 @@ public class cFile extends CodeFile{
                     if( !isCommentLine(line.trim()) && !commentBlock ){
                         countLOC ++;
                     
+                        // Method Invocation
+                        if(Pattern.matches(".*[^\\s]*\\(.*", line)){
+                            Pattern p = Pattern.compile("[^\\s]*\\(");
+                            Matcher m = p.matcher(replaceWithSpaces(line).replaceAll("\\(", "\\( "));
+                            while(m.find()) {
+                                String temp= (String) m.group().subSequence(0, m.group().length()-1);
+                                String method= methodName.split(" ")[methodName.split(" ").length-1];
+                                if(!temp.equals("") && !pre_Inv.equals(method) ){
+                                    allInvocations.add(temp +";"+ method);
+                                }
+                                pre_Inv=temp;
+                            }
+                        }
+                        
                         // For fan-out
                         if( lineTable[0].equals("#include") ){
                             String temp=line.replace("#include", "");
@@ -83,7 +101,7 @@ public class cFile extends CodeFile{
                             attributes.add(temp);
                         }
                         if(!methodsLocDecl.isEmpty()){
-                            String[] lineVar= replaceWithSpaces(line).split(" ");
+                            String[] lineVar= replaceWithSpaces(line).replaceAll("\\(", " ").split(" ");
                             for(String str: lineVar){
                                 if( attributes.contains(str.trim()) ){
                                     attributesInMethods.add(str.trim()+" "+methodName);
@@ -196,6 +214,25 @@ public class cFile extends CodeFile{
                 }
             }
             
+            //keep only relevant invocations
+            ArrayList<String> invocations=new ArrayList<>();
+            for(String str: allInvocations){
+                for(String str2: methodsLOC.keySet()){
+                    String meth= str2.split(" ")[str2.split(" ").length-1];
+                    if(str.split(";")[0].equals(meth)){
+                        invocations.add(str);
+                        break;
+                    }
+                }
+            }
+            for(int i=0; i<invocations.size()-1; i++){
+                if(!invocations.get(i).split(";")[0].equals(invocations.get(i+1).split(";")[1])){
+                    this.methodInvocations.add(invocations.get(i));
+                }
+                //the last one is lost!
+            }
+            
+            totalLines=countLOCr;
             /*Print methods
             System.out.println("N= " +fanOut);
             for(String str: methodsLOC.keySet()){
@@ -259,7 +296,7 @@ public class cFile extends CodeFile{
         cParserSemiLatest ss = new cParserSemiLatest(file,methodsLocDecl);
         ss.parse();
         ParsedFilesController paFC=new ParsedFilesController();
-        this.cohesion= paFC.doAnalysisLcom(file);
+        paFC.doAnalysisLcom(this);
         
         //calculateOpportunities();
     }
@@ -299,8 +336,8 @@ public class cFile extends CodeFile{
     
     private String replaceWithSpaces(String line) {
 		line = line.replaceAll("\\+", " ");
+		line = line.replaceAll("\\.", " ");
 		line = line.replaceAll("-", " ");
-		line = line.replaceAll("\\(", " ");
 		line = line.replaceAll("\\)", " ");
 		line = line.replaceAll("\\*", " ");
 		line = line.replaceAll("/", " ");

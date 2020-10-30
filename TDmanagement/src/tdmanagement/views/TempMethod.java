@@ -3,13 +3,13 @@ package tdmanagement.views;
 public class TempMethod {
 	private String name;
 	private int CC;
-	private int LOC;
+	private double LCOL;
 
 
-	TempMethod(String name, int CC, int LOC){
+	TempMethod(String name, int CC, double LCOL){
 		this.name=name;
 		this.CC=CC;
-		this.LOC=LOC;
+		this.LCOL=LCOL;
 	}
 
 	public String getName() {
@@ -28,12 +28,12 @@ public class TempMethod {
 		CC = cC;
 	}
 
-	public int getLOC() {
-		return LOC;
+	public double getLCOL() {
+		return LCOL;
 	}
 
-	public void setLOC(int lOC) {
-		LOC = lOC;
+	public void setLOC(int lCOL) {
+		LCOL = lCOL;
 	}
 
 	public String toString() {

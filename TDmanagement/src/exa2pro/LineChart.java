@@ -25,7 +25,7 @@ public class LineChart extends ApplicationFrame {
         this.metric=metric;
         
         String value= "Hours";
-        if(metric.equals("TD") && daysValue())
+        if(daysValue() && metric.equals("TD"))
             value= "Days";
         else
             value= "Metric";
@@ -59,13 +59,13 @@ public class LineChart extends ApplicationFrame {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         int version = 1;
+        boolean days=daysValue();
         
         for (Project p : allProject) {
             double num=0;
             switch (metric) {
                 case "TD":
                 {
-                    boolean days=daysValue();
                     String s=p.getprojectReport().getTotalDebt();
                     double st = Double.parseDouble(s.replace("min", "").replace("h", "").replace("d", ""));
                     if(s.contains("d")){
@@ -95,11 +95,11 @@ public class LineChart extends ApplicationFrame {
                         num= sum/p.getprojectFiles().size();
                         break;
                     }
-                case "LCOL":
+                case "LOC":
                     {
-                        double sum=0;
-                        sum = p.getprojectFiles().stream().map((cf) -> cf.cohesion).reduce(sum, Double::sum);
-                        num= sum/p.getprojectFiles().size();
+                        int sum=0;
+                        sum = p.getprojectFiles().stream().map((cf) -> cf.totalLines).reduce(sum, Integer::sum);
+                        num= sum*1.0/p.getprojectFiles().size();
                         break;
                     }
                 case "LCOP":
@@ -112,6 +112,8 @@ public class LineChart extends ApplicationFrame {
                                 i++;
                             }
                         }
+                        if(i==0)
+                        	i=1;
                         num= sum/i;
                         break;
                     }
@@ -128,13 +130,13 @@ public class LineChart extends ApplicationFrame {
                         num= sum/i;
                         break;
                     }
-                case "LOC":
+                case "LCOL":
                     {
                         int sum=0;
                         int i=0;
                         for(CodeFile cf: p.getprojectFiles()){
-                            for (HashMap.Entry pair : cf.methodsLOC.entrySet()) {
-                                sum+= (Integer)pair.getValue();
+                            for (HashMap.Entry pair : cf.methodsLCOL.entrySet()) {
+                                sum+= (Double)pair.getValue();
                                 i++;
                             }
                         }

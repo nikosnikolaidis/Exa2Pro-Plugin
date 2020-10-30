@@ -89,7 +89,7 @@ public class ChartView extends ViewPart {
         jLabeProgress.setText("Progress");
 
         jListMetrics.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "TD", "Issues", "Fan-Out", "LCOL", "LCOF", "CC", "LOC" };
+            String[] strings = { "TD", "Issues", "CBF", "LOC", "LCOP", "CC", "LCOL" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });

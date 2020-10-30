@@ -39,25 +39,28 @@ public class ParsedFilesController {
     int methodLineStart;
     int methodLineStop;
     
-    public double doAnalysisLcom(File file) {
+    public void doAnalysisLcom(CodeFile cf) {
         Analyser analyser = new Analyser();
-        analyser.setFile(file);
+        analyser.setFile(cf.file);
         JavaClass myclass=analyser.performAnalysis();
         
         //Calculate sum of all methods lcom2
         double sum=0;
+        
         for(int i=0; i< myclass.getMethods().size(); i++){
+            cf.methodsLCOL.put( myclass.getMethods().get(i).getName().replaceFirst("\\(.*\\)", ""),
+                        myclass.getMethods().get(i).getMetricIndexFromName("lcom2") );
             sum += myclass.getMethods().get(i).getMetricIndexFromName("lcom2");
         }
         
-	File fileDel = new File("./" + file.getName() + "_parsed.txt");
+	File fileDel = new File("./" + cf.file.getName() + "_parsed.txt");
         fileDel.delete();
         
         //return average
         int num=myclass.getMethods().size();
         if(num==0)
             num=1;
-        return sum/num;
+        cf.cohesion= sum*1.0/num;
     }
     
     
