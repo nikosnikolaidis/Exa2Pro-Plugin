@@ -15,8 +15,12 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.part.ViewPart;
 
+import exa2pro.Exa2Pro;
 import exa2pro.LineChart;
 import exa2pro.Project;
+import panels_frames.JPanelForecasting;
+import tdmanagement.Activator;
+import tdmanagement.preferences.PreferenceConstants;
 
 public class Forecasting extends ViewPart{
 
@@ -27,10 +31,12 @@ public class Forecasting extends ViewPart{
 
 	@Inject IWorkbench workbench;
 	
-	private Composite composite;
+	private static Composite composite;
 	private static Frame frame;
 	
 	public static Project project;
+	
+	private static javax.swing.JPanel jPanelChart;
 
 	
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -55,9 +61,25 @@ public class Forecasting extends ViewPart{
 	}
 	
 	public static void build() {
-		frame.add(new JPanelForecasting(project));
+    	Exa2Pro.TDForecasterPath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_Forecaster);
+    	Exa2Pro.pythonRun= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_STRING_PYTHON);
+    	
+		if(!Exa2Pro.TDForecasterPath.equals("")) {
+			JPanelForecasting jpF=new JPanelForecasting(project);
+			frame.add(jpF);
+			if(!jpF.hasResults) {
+				showMessage("Cannot provide reliable results for this project. Please reduce forecasting horizon");
+			}
+			frame.repaint();
+		}
 	}
 	
+	
+	private static void showMessage(String message) {
+		MessageDialog.openInformation(composite.getShell(),
+			"Forecasting View",
+			message);
+	}
 
 	@Override
 	public void setFocus() {

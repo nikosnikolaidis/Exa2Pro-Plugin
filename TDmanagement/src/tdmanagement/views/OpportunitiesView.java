@@ -62,8 +62,10 @@ public class OpportunitiesView extends ViewPart {
 	static TableViewerColumn colMethodName;
 	static TableViewerColumn colLines;
 	static TableViewerColumn colBenefit;
+	static TableViewerColumn colCluster;
 
 	public static ArrayList<String> array = new ArrayList<>();
+	public static boolean split;
 
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		@Override
@@ -112,6 +114,10 @@ public class OpportunitiesView extends ViewPart {
 
 			viewer.getTable().removeAll();
 		}
+		else if (colCluster!=null){
+			colCluster.getColumn().dispose();
+			viewer.getTable().removeAll();
+		}
 	}
 
 	/**
@@ -120,9 +126,10 @@ public class OpportunitiesView extends ViewPart {
 	public static void addElementsToTable() {
 		removePrev();
 
+		if(split) {
 		colMethodName = new TableViewerColumn(viewer, SWT.NONE);
 		colMethodName.getColumn().setWidth(200);
-		colMethodName.getColumn().setText("Procdure");
+		colMethodName.getColumn().setText("Procedure");
 		colMethodName.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -150,6 +157,18 @@ public class OpportunitiesView extends ViewPart {
 				return temp.split(" ")[3];
 			}
 		});
+		}
+		else {
+			colCluster = new TableViewerColumn(viewer, SWT.NONE);
+			colCluster.getColumn().setWidth(400);
+			colCluster.getColumn().setText("Cluster");
+			colCluster.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(Object element) {
+					return (String) element;
+				}
+			});
+		}
 
 		viewer.setInput(array);
 	}

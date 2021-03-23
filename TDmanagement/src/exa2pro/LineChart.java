@@ -25,8 +25,10 @@ public class LineChart extends ApplicationFrame {
         this.metric=metric;
         
         String value= "Hours";
-        if(daysValue() && metric.equals("TD"))
+        if(daysValue() && metric.equals("SC TD"))
             value= "Days";
+        else if (metric.equals("Interest") || metric.equals("Design TD"))
+            value= "€";
         else
             value= "Metric";
         
@@ -64,7 +66,7 @@ public class LineChart extends ApplicationFrame {
         for (Project p : allProject) {
             double num=0;
             switch (metric) {
-                case "TD":
+                case "SC TD":
                 {
                     String s=p.getprojectReport().getTotalDebt();
                     double st = Double.parseDouble(s.replace("min", "").replace("h", "").replace("d", ""));
@@ -85,10 +87,16 @@ public class LineChart extends ApplicationFrame {
                     }
                     break;
                 }
+                case "Design TD":
+                    num= p.getprojectReport().getTDPrincipalDesignDebt();
+                    break;
+                case "Interest":
+                    num= p.getprojectReport().getTotalTDInterest();
+                    break;
                 case "Issues":
                     num= p.getprojectReport().getTotalCodeSmells();
                     break;
-                case "Fan-Out":
+                case "CBF":
                     {
                         int sum=0;
                         sum = p.getprojectFiles().stream().map((cf) -> cf.fanOut).reduce(sum, Integer::sum);
@@ -113,7 +121,7 @@ public class LineChart extends ApplicationFrame {
                             }
                         }
                         if(i==0)
-                        	i=1;
+                            i=1;
                         num= sum/i;
                         break;
                     }

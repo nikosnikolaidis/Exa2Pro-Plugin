@@ -5,6 +5,7 @@
  */
 package exa2pro;
 
+import static exa2pro.Exa2Pro.Dos2UnixPath;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -208,7 +209,24 @@ public class Analysis {
         try {
             //TODO
             // Add waiting animation
-
+            
+            //files to unix format
+        	if(!Exa2Pro.Dos2UnixPath.equals("")) {
+	            Process proc1 = Runtime.getRuntime().exec("cmd /c \"cd " + project.getCredentials().getProjectDirectory() + " && "+
+	        			Exa2Pro.Dos2UnixPath + " *.*" + "\"");
+	            BufferedReader reader2 = new BufferedReader(new InputStreamReader(proc1.getErrorStream()));
+	            String line2;
+	            while ((line2 = reader2.readLine()) != null) {    
+	                System.out.println(line2);
+	            }
+	            BufferedReader reader1 = new BufferedReader(new InputStreamReader(proc1.getInputStream()));
+	            String line1;
+	            while ((line1 = reader1.readLine()) != null) {    
+	                System.out.println(line1);
+	            }
+        	}
+            
+            //analysis
             System.out.println(System.getProperty("user.dir"));
             Process proc = Runtime.getRuntime().exec("cmd /c \"cd " + project.getCredentials().getProjectDirectory() + " && "
                     + Exa2Pro.sonarScannerPath+ "\"");
@@ -237,10 +255,16 @@ public class Analysis {
             report.setTotalCodeSmells(Integer.parseInt(report.getMetricFromSonarQube("code_smells")));
             report.setTotalLinesOfCode(Integer.parseInt(report.getMetricFromSonarQube("ncloc")));
             report.setTotalComplexity(Integer.parseInt(report.getMetricFromSonarQube("complexity")));
+            report.setDuplicated_blocks(Integer.parseInt(report.getMetricFromSonarQube("duplicated_blocks")));
+            report.setReliability_remediation_effort(Integer.parseInt(report.getMetricFromSonarQube("reliability_remediation_effort")));
+            report.setSecurity_remediation_effort(Integer.parseInt(report.getMetricFromSonarQube("security_remediation_effort")));
             report.setLinesOfCodeForAllLanguages(report.getMetricFromSonarQube("ncloc_language_distribution").replace(";", "\n"));
             
             report.getIssuesFromSonarQube();
             report.getTDLinesOfFilesFromSonarQube();
+            
+            report.startCalculationTDInterest();
+            report.startCalculationTDPrincipal();
         } catch (InterruptedException | IOException ex) {
             Logger.getLogger(Analysis.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -302,10 +326,16 @@ public class Analysis {
             report.setTotalCodeSmells(Integer.parseInt(report.getMetricFromSonarQube("code_smells")));
             report.setTotalLinesOfCode(Integer.parseInt(report.getMetricFromSonarQube("ncloc")));
             report.setTotalComplexity(Integer.parseInt(report.getMetricFromSonarQube("complexity")));
+            report.setDuplicated_blocks(Integer.parseInt(report.getMetricFromSonarQube("duplicated_blocks")));
+            report.setReliability_remediation_effort(Integer.parseInt(report.getMetricFromSonarQube("reliability_remediation_effort")));
+            report.setSecurity_remediation_effort(Integer.parseInt(report.getMetricFromSonarQube("security_remediation_effort")));
             report.setLinesOfCodeForAllLanguages(report.getMetricFromSonarQube("ncloc_language_distribution").replace(";", "\n"));
             
             report.getIssuesFromSonarQube();
             report.getTDLinesOfFilesFromSonarQube();
+            
+            report.startCalculationTDInterest();
+            report.startCalculationTDPrincipal();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -14,4 +14,14 @@ public class PreferenceConstants {
 
 	public static final String P_PATH_iCode = "pathPreferenceICode";
 	
+	public static final String P_STRING_PYTHON = "stringPreferencePythonRun";
+
+	public static final String P_PATH_Clustering = "pathPreferenceClustering";
+
+	public static final String P_Number_ClusteringThreshold = "numberPreferenceClusteringThreshold";
+
+	public static final String P_PATH_Forecaster = "pathPreferenceForecaster";
+	
+	public static final String P_PATH_Dos2Unix = "pathPreferenceDos2Unix";
+	
 }

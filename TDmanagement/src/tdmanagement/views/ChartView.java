@@ -89,7 +89,7 @@ public class ChartView extends ViewPart {
         jLabeProgress.setText("Progress");
 
         jListMetrics.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "TD", "Issues", "CBF", "LOC", "LCOP", "CC", "LCOL" };
+            String[] strings = { "SC TD", "Design TD", "Interest", "Issues", "CBF", "LOC", "LCOP", "CC", "LCOL" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -126,7 +126,7 @@ public class ChartView extends ViewPart {
                     .addGap(6, 6, 6)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabeProgress)
-                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(jPanelChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGap(6, 6, 6)))
@@ -142,14 +142,14 @@ public class ChartView extends ViewPart {
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabeProgress)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGap(0, 374, Short.MAX_VALUE)))
                     .addGap(7, 7, 7)))
         );
         
         frame.add(jPanelChart1);
         
-        jListMetrics.setSelectedIndex(0);
+        jListMetrics.setSelectedIndex(5);
         addChart("LOC");
 	}
 	

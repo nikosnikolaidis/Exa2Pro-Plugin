@@ -1,8 +1,10 @@
 package parsers;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -167,7 +169,13 @@ public class cParserSemiLatest {
 			cleanParsedLines();
 
 			//utils.Utilities.writeCSV("./" + file.getName() + "_parsed.txt", this.parsedLines, false);	//auto xrisimopoiitai gia analiseis, kai se auto enonontai ta mikra IF, an treksei o katallilos kwdikas
-			
+			BufferedWriter writer= new BufferedWriter(new FileWriter(file.getName()+"_parsed.txt", false));
+                        writer.write("");
+			for(String st: this.parsedLines) {
+                            writer.append(st+ System.lineSeparator());
+			}
+                        writer.close();
+                        
 			//utils.Utilities.writeCSV("./" + file.getName() + "_original_parsed.txt", this.parsedLines, false);	//arxeio pou den allazei to _parsed arxeio. Edw ta IF paramenoun opws itan. Axristo stin periptwsi pou den enosoume ta IF
 
 		} catch (IOException ex) {

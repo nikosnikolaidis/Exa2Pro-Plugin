@@ -2,6 +2,9 @@ package tdmanagement.preferences;
 
 import org.eclipse.jface.preference.*;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+
+import exa2pro.Exa2Pro;
+
 import org.eclipse.ui.IWorkbench;
 import tdmanagement.Activator;
 
@@ -50,6 +53,22 @@ public class PreferencePage
 
 		addField(new FileFieldEditor(PreferenceConstants.P_PATH_iCode, 
 				"iCode path preference:", getFieldEditorParent()));
+		
+		addField(new StringFieldEditor(PreferenceConstants.P_STRING_PYTHON, 
+				"Python run preference:", getFieldEditorParent()));
+
+		addField(new DirectoryFieldEditor(PreferenceConstants.P_PATH_Clustering, 
+				"Clustering path preference:", getFieldEditorParent()));
+
+		addField(new StringFieldEditor(PreferenceConstants.P_Number_ClusteringThreshold, 
+				"Clustering threshold:", getFieldEditorParent()));
+
+		addField(new DirectoryFieldEditor(PreferenceConstants.P_PATH_Forecaster, 
+				"TD Forecaster path preference:", getFieldEditorParent()));
+
+		if(Exa2Pro.isWindows())
+			addField(new FileFieldEditor(PreferenceConstants.P_PATH_Dos2Unix, 
+					"Dos2Unix path preference:", getFieldEditorParent()));
 	}
 
 	/* (non-Javadoc)

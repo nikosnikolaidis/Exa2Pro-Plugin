@@ -5,6 +5,7 @@
  */
 package csvControlers;
 
+import exa2pro.Exa2Pro;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class CSVWriteForClustering {
     }
 
     public void givenDataArray_whenConvertToCSV_thenOutputCreated(String fileName) {
-        File csvOutputFile = new File(System.getProperty("user.dir")+"/clustering_"+ fileName+".csv");
+        File csvOutputFile = new File(Exa2Pro.ClusteringPath+"/clustering_"+ fileName+".csv");
         try {
             if (csvOutputFile.createNewFile()) {
                 try (PrintWriter pw = new PrintWriter(csvOutputFile)) {

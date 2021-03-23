@@ -79,7 +79,8 @@ public class fortranParserSemi {
             ArrayList<String> methodParam=new ArrayList<>();
             String methodToPrint="";
             
-            writer = new BufferedWriter(new FileWriter(file.getName()+"_parsed.txt", true));
+            writer = new BufferedWriter(new FileWriter(file.getName()+"_parsed.txt", false));
+            writer.write("");
             while ((line = br.readLine()) != null) {
                 countLOC ++;
                 if (!line.trim().isEmpty()){

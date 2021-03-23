@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.SWT;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -47,6 +48,7 @@ public class MetricsView extends ViewPart {
 	@Inject IWorkbench workbench;
 	
 	private static TableViewer viewer;
+	private Action actionOverview;
 	private Action action1;
 	private Action action2;
 	
@@ -58,9 +60,11 @@ public class MetricsView extends ViewPart {
 	static TableViewerColumn colMethodName;
 	static TableViewerColumn colCC;
 	static TableViewerColumn colLCOL;
+	static TableViewerColumn colOverviewName;
+	static TableViewerColumn colOverviewValue;
 	
 	public static ArrayList<CodeFile> array=new ArrayList<CodeFile>();
-	
+	public static HashMap<String, String> arrayOverview= new HashMap<>();
 
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		@Override
@@ -112,6 +116,10 @@ public class MetricsView extends ViewPart {
 			colLOC.getColumn().dispose();
 			colLCOP.getColumn().dispose();
 		}
+		if(colOverviewName!=null) {
+			colOverviewName.getColumn().dispose();
+			colOverviewValue.getColumn().dispose();
+		}
 		viewer.getTable().removeAll();
 	}
 	
@@ -120,7 +128,7 @@ public class MetricsView extends ViewPart {
 	 * Adds columns for file metrics 
 	 * and sets all the files to the table
 	 */
-	public static void addElementsToTableFile() {
+	public void addElementsToTableFile() {
 		colFileName = new TableViewerColumn(viewer, SWT.NONE);
 		colFileName.getColumn().setWidth(200);
 		colFileName.getColumn().setText("File");
@@ -220,9 +228,54 @@ public class MetricsView extends ViewPart {
 	}
 	
 	/**
+	 * Adds columns for overview metrics 
+	 * and adds all the overview metrics to the table by using ThempOverviewMetrics class
+	 */
+	public static void addElementsToTableOverview() {
+		colOverviewName = new TableViewerColumn(viewer, SWT.NONE);
+		colOverviewName.getColumn().setWidth(300);
+		colOverviewName.getColumn().setText("Overview Metric");
+		colOverviewName.setLabelProvider(new ColumnLabelProvider() {
+		    @Override
+		    public String getText(Object element) {
+		    	TempOverviewMetrics temp= (TempOverviewMetrics)element;
+		        return temp.getName();
+		    }
+		});
+		colOverviewValue = new TableViewerColumn(viewer, SWT.NONE);
+		colOverviewValue.getColumn().setWidth(100);
+		colOverviewValue.getColumn().setText("Value");
+		colOverviewValue.setLabelProvider(new ColumnLabelProvider() {
+		    @Override
+		    public String getText(Object element) {
+		    	TempOverviewMetrics temp= (TempOverviewMetrics)element;
+		        return temp.getValue();
+		    }
+		});
+		
+		for(String key: arrayOverview.keySet()){
+			TempOverviewMetrics tO= new TempOverviewMetrics(key, arrayOverview.get(key));
+			viewer.add(tO);
+        }
+	}
+	
+	/**
 	 * Set action1 and action2
 	 */
 	private void makeActions() {
+		actionOverview = new Action() {
+			public void run() {
+				removePrev();
+				//add new columns and data
+				addElementsToTableOverview();
+			}
+		};
+		actionOverview.setText("Overview Metrics");
+		actionOverview.setToolTipText("See Overview metrics");
+		actionOverview.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
+			getImageDescriptor(ISharedImages.IMG_ETOOL_HOME_NAV));
+		
+		
 		action1 = new Action() {
 			public void run() {
 				removePrev();
@@ -270,12 +323,15 @@ public class MetricsView extends ViewPart {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
+		manager.add(actionOverview);
+		manager.add(new Separator());
 		manager.add(action1);
 		manager.add(new Separator());
 		manager.add(action2);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
+		manager.add(actionOverview);
 		manager.add(action1);
 		manager.add(action2);
 		// Other plug-ins can contribute there actions here
@@ -283,6 +339,7 @@ public class MetricsView extends ViewPart {
 	}
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(actionOverview);
 		manager.add(action1);
 		manager.add(action2);
 	}

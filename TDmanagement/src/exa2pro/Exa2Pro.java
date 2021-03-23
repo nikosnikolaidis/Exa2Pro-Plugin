@@ -5,7 +5,7 @@
  */
 package exa2pro;
 
-//import panels_frames.HomeFrame;
+import panels_frames.HomeFrame;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,10 +30,14 @@ public class Exa2Pro {
 
     private static String OS = System.getProperty("os.name").toLowerCase();
     public static ArrayList<ProjectCredentials> projecCredentialstList = new ArrayList<>();
-    public static String iCodePath;
+    public static String iCodePath="";
     public static String sonarPath;
     public static String sonarURL;
     public static String sonarScannerPath;
+    public static String TDForecasterPath;
+    public static String ClusteringPath;
+    public static String pythonRun;
+    public static String Dos2UnixPath;
 
     /**
      * @param args the command line arguments
@@ -42,13 +46,20 @@ public class Exa2Pro {
         getProjetsFromFile();
         getSettingFromFile();
 
-        if(isWindows())
+        if(isWindows()){
             sonarScannerPath= System.getProperty("user.dir") + "\\sonar-scanner-4.2-windows\\bin\\sonar-scanner.bat";
-        else
+            TDForecasterPath= System.getProperty("user.dir") + "\\td-forecaster";
+            ClusteringPath= System.getProperty("user.dir") + "\\clustering";
+            Dos2UnixPath= sonarScannerPath.replace("sonar-scanner.bat", "dos2unix.exe");
+        }
+        else{
             sonarScannerPath= System.getProperty("user.dir")+ "/sonar-scanner-4.2-linux/bin/sonar-scanner";
+            TDForecasterPath= System.getProperty("user.dir") + "/td-forecaster";
+            ClusteringPath= System.getProperty("user.dir") + "/clustering";
+        }
         
-//        HomeFrame homeFrame = new HomeFrame();
-//        homeFrame.setVisible(true);
+        HomeFrame homeFrame = new HomeFrame();
+        homeFrame.setVisible(true);
     }
 
     //find the OS of the machine
@@ -87,6 +98,8 @@ public class Exa2Pro {
                     iCodePath = line.replace("sonar.icode.path=", "");
                 } else if (line.contains("sonar.path=")){
                     sonarPath = line.replace("sonar.path=", "");
+                } else if (line.contains("python.run=")){
+                    pythonRun = line.replace("python.run=", "");
                 }
             }
             if(!urlFound)
@@ -94,6 +107,7 @@ public class Exa2Pro {
         } catch (IOException ex) {
             System.out.println("exa2pro.Exa2Pro.getSettingFromFile()");
             sonarURL="http://localhost:9000";
+            pythonRun="python";
         }
     }
 
@@ -101,14 +115,17 @@ public class Exa2Pro {
      * Save settings
      * @param url the SonarQube url
      * @param icode the icode path
+     * @param sonarP the path of sonarqube
+     * @param python the command of running python
      */
-    public static void saveSettingsToFile(String url, String icode, String sonarP) {
+    public static void saveSettingsToFile(String url, String icode, String sonarP, String python) {
         try {
             //save sonarqube url/path and icode path to my setting file
             BufferedWriter writer = new BufferedWriter(new FileWriter("mySettings.txt"));
             writer.write("sonar.host.url=" + url + System.lineSeparator());
             writer.append("sonar.path=" + sonarP + System.lineSeparator());
             writer.append("sonar.icode.path=" + icode + System.lineSeparator());
+            writer.append("python.run=" + python + System.lineSeparator());
             writer.close();
 
             //save sonarqube url to conf\sonar-scanner.properties
@@ -142,5 +159,18 @@ public class Exa2Pro {
             Logger.getLogger(Exa2Pro.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+    
+    /**
+     * Delete previous .csv files
+     */
+    public static void deletePreviousClasteringCSV(){
+        File directory = new File(Exa2Pro.ClusteringPath);
+        File[] fList = directory.listFiles();
+        for (File temp : fList) {
+            if (temp.isFile() && !temp.getName().endsWith(".py")){
+                temp.delete();
+            }
+        }
     }
 }

@@ -2,10 +2,12 @@ package tdmanagement.handlers;
 
 import static java.util.stream.Collectors.toMap;
 
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -33,6 +35,8 @@ import exa2pro.PieChart;
 import exa2pro.Project;
 import exa2pro.ProjectCredentials;
 import parsers.CodeFile;
+import tdmanagement.Activator;
+import tdmanagement.preferences.PreferenceConstants;
 import tdmanagement.views.ChartView;
 import tdmanagement.views.Forecasting;
 import tdmanagement.views.MetricsView;
@@ -76,6 +80,9 @@ public class LoadLastHandler extends AbstractHandler{
 	    			projectC=pc;
 	    		}
 	    	}
+	    	Exa2Pro.TDForecasterPath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_Forecaster);
+	    	Exa2Pro.ClusteringPath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_Clustering);
+	    	Exa2Pro.pythonRun= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_STRING_PYTHON);
 	    	
 	    	if(projectC==null) {
 	    		MessageDialog.openInformation(window1.getShell(),
@@ -94,14 +101,61 @@ public class LoadLastHandler extends AbstractHandler{
 					e.printStackTrace();
 				}
 
+		    	
 		    	//Get project
 	            p= projectC.getProjects().get(projectC.getProjects().size()-1);
 	    		
+	            
 	            // Metrics
 		    	//Remove Previous content and add new results 
+	            DecimalFormat round = new DecimalFormat("#,###.#");
 		    	MetricsView.removePrev();
+		    	//set array for file files
 		    	MetricsView.array=p.getprojectFiles();
-		    	MetricsView.addElementsToTableFile();
+		    	//set arrayOverview for overview metrics
+		    	MetricsView.arrayOverview.put("Technical Debt", p.getprojectReport().getTotalDebt());
+		    	MetricsView.arrayOverview.put("Source Code Debt", round.format(p.getprojectReport().getTDPrincipalSourceCodeDebt()) + " €");
+		    	MetricsView.arrayOverview.put("Design Debt", round.format(p.getprojectReport().getTDPrincipalDesignDebt()) + " €");
+		        if(p.getprojectReport().getTotalTDInterest()!=0)
+		        	MetricsView.arrayOverview.put("TD Interest", round.format(p.getprojectReport().getTotalTDInterest()) + " €");
+		        else
+		        	MetricsView.arrayOverview.put("TD Interest", "-");
+		    	MetricsView.arrayOverview.put("Code Smells", p.getprojectReport().getTotalCodeSmells()+"");
+		    	//system metrics
+		    	double sumLOC=0;
+		        int sumLCOP=0;
+		        int countNonUndif=0;
+		        int sumCC=0;
+		        int sumLCOL=0;
+		        int sumFO=0;
+		        int c=0;
+		        for(CodeFile cf: p.getprojectFiles()){
+		            sumLOC+= cf.totalLines;
+		            sumFO+= cf.fanOut;
+		            if(cf.lcop!=-1){
+		                sumLCOP+= cf.lcop;
+		                countNonUndif++;
+		            }
+		            for (Map.Entry<String, Integer> entry : cf.methodsCC.entrySet()) {
+		                sumCC+= entry.getValue();
+		                c++;
+		            }
+		            for (Map.Entry<String, Double> entry : cf.methodsLCOL.entrySet()) {
+		                sumLCOL+= entry.getValue();
+		            }
+		        }
+		        DecimalFormat df = new DecimalFormat("#.#");
+		        MetricsView.arrayOverview.put("CC", df.format(sumCC*1.0/c) +"");
+		        MetricsView.arrayOverview.put("LCOL", df.format(sumLCOL*1.0/c) +"");
+		        MetricsView.arrayOverview.put("CBF", df.format(sumFO*1.0/p.getprojectFiles().size()) +"");
+		        MetricsView.arrayOverview.put("LOC", df.format(sumLOC/p.getprojectFiles().size()) +"");
+		        if(countNonUndif==0)
+		        	MetricsView.arrayOverview.put("LCOP", "-");
+		        else
+		        	MetricsView.arrayOverview.put("LCOP", df.format(sumLCOP/countNonUndif) +"");
+		    	//set default table
+		    	MetricsView.addElementsToTableOverview();
+		    	
 		    	
 		    	
 		    	// Refactorings
@@ -125,7 +179,7 @@ public class LoadLastHandler extends AbstractHandler{
 		            allMethodsLCOL.putAll(prefixHashMap(cf.methodsLCOL, cf.file.getName(), thresholds, "LCOL"));
 		        }
 		        //sort the lists
-		      //sort the lists
+		        //sort the lists
 		        HashMap<String, Double> sortedCC= allMethodsCC.entrySet()
 		        .stream()
 		        .sorted(Collections.reverseOrder(HashMap.Entry.comparingByValue()))
@@ -187,64 +241,72 @@ public class LoadLastHandler extends AbstractHandler{
 		        	}
 		        	
 		            for(Issue i: p.getprojectReport().getIssuesList()){
-						for(CodeFile cf: p.getprojectFiles()) {
-							if(cf.file.getAbsolutePath().endsWith(i.getIssueDirectory().split(":")[1].replaceAll("/", "\\\\"))) {
-				            	///** add markers **///
-								IPath locationIssue = Path.fromOSString(cf.file.getAbsolutePath());
-								IFile ifile = workspace.getRoot().getFileForLocation(locationIssue);
-								IMarker marker = null;
-								try {
-									marker = ifile.createMarker("com.ibm.mymarkers.mymarker");
-									marker.setAttribute(IMarker.MESSAGE, i.getIssueDebt() +"   "+ i.getIssueName() );
-									marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(i.getIssueStartLine()) );
-									marker.setAttribute(IMarker.TEXT, i.getIssueName());
-									if( i.getIssueSeverity().equals("INFO")  )
-										marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
-									else if( i.getIssueSeverity().equals("MINOR") || i.getIssueSeverity().equals("MAJOR") )
-										marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-									else 
-										marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-								} catch (CoreException e) {
-									e.printStackTrace();
+		            	String[] nameFile= i.getIssueDirectory().split(":")[1].split("\\.");
+		                if(nameFile[nameFile.length-1].equalsIgnoreCase("f90") || nameFile[nameFile.length-1].equalsIgnoreCase("f") 
+		                				|| nameFile[nameFile.length-1].equalsIgnoreCase("f77") || nameFile[nameFile.length-1].equalsIgnoreCase("for") 
+		                                || nameFile[nameFile.length-1].equalsIgnoreCase("fpp") || nameFile[nameFile.length-1].equalsIgnoreCase("ftn")){
+		                    CodeFile cf= p.getFortranFilesIndexed().get(Integer.parseInt(nameFile[0]));
+		                    ///** add markers **///
+		                    addMarker(workspace, i, cf);
+		                }
+		                else {
+		                	for(CodeFile cf: p.getprojectFiles()) {
+								if(cf.file.getAbsolutePath().endsWith(i.getIssueDirectory().split(":")[1].replaceAll("/", "\\\\"))) {
+					            	///** add markers **///
+									addMarker(workspace, i, cf);
 								}
-								///** add markers **///
 							}
-						}
+		                }
 		            }
 	            }
 	            catch(NullPointerException e) {
 	            	e.printStackTrace();
 	            }
-	            
-
-		    	//Forecasting View
-		    	try {
+		    	
+	            //Charts
+	            try {
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("tdmanagement.views.Forecasting");
 				} catch (PartInitException e) {
 					e.printStackTrace();
 				}
-	            
 	            Forecasting.project=p;
 	            Forecasting.build();
 	            
-		    	
-	            //Charts
 	            try {
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("tdmanagement.views.ChartView");
 				} catch (PartInitException e) {
 					e.printStackTrace();
 				}
-	            
 	            ChartView.project=p;
 	            ChartView.build();
+				
 	            
 	    	}
 	    	
-	    	
 	    }
 		
-		
 		return null;
+	}
+
+
+	private void addMarker(IWorkspace workspace, Issue i, CodeFile cf) {
+		IPath locationIssue = Path.fromOSString(cf.file.getAbsolutePath());
+		IFile ifile = workspace.getRoot().getFileForLocation(locationIssue);
+		IMarker marker = null;
+		try {
+			marker = ifile.createMarker("com.ibm.mymarkers.mymarker");
+			marker.setAttribute(IMarker.MESSAGE, i.getIssueDebt() +"   "+ i.getIssueName() );
+			marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(i.getIssueStartLine()) );
+			marker.setAttribute(IMarker.TEXT, i.getIssueName());
+			if( i.getIssueSeverity().equals("INFO")  )
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
+			else if( i.getIssueSeverity().equals("MINOR") || i.getIssueSeverity().equals("MAJOR") )
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+			else 
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

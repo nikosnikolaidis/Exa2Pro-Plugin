@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import parsers.CodeFile;
@@ -29,7 +30,9 @@ public class Project implements Serializable {
     private String projectVersion;
     private ArrayList<CodeFile> projectFiles=new ArrayList<>();
     private Report projectReport;
-    private ArrayList<CodeFile> fortranDeletedFiles=new ArrayList<>();
+    
+    private HashMap<Integer, CodeFile> fortranFilesIndexed= new HashMap<>();
+    private int countFortran=0;
     
     public Project(ProjectCredentials c, String version){
         credentials=c;
@@ -43,6 +46,10 @@ public class Project implements Serializable {
      * Creates a small analysis and executes it
      */
     public void projectVersionAnalysis(){
+        //delete issues of prv for memory opt
+        if(getCredentials().getProjects().size()>1)
+            getCredentials().getProjects().get(getCredentials().getProjects().size()-2).projectReport.getIssuesList().clear();
+        //analyze
         Analysis a= new Analysis(this);
         a.runCustomCreatedMetrics();
         
@@ -53,6 +60,10 @@ public class Project implements Serializable {
      * Creates a Full analysis and executes it
      */
     public void projectVersionAnalysisFull(){
+        //delete issues of prv for memory opt
+        if(getCredentials().getProjects().size()>1)
+            getCredentials().getProjects().get(getCredentials().getProjects().size()-2).projectReport.getIssuesList().clear();
+        //analyze
         Analysis a= new Analysis(this);
         a.runCustomCreatedMetrics();
         a.createPropertiesFile();
@@ -66,6 +77,11 @@ public class Project implements Serializable {
      * @param directoryName the directory to search for files
      */
     public void getFilesForAnalysis(String directoryName){
+        //get previous countFortran
+        if(credentials.getProjects().size()>1){
+            countFortran= credentials.getProjects().get(credentials.getProjects().size()-2).countFortran;
+        }
+        
         File directory = new File(directoryName);
         // Get all files from a directory.
         File[] fList = directory.listFiles();
@@ -74,12 +90,18 @@ public class Project implements Serializable {
                 if (file.isFile() && file.getName().contains(".") && file.getName().charAt(0)!='.') {
                     String[] str=file.getName().split("\\.");
                     // For all the filles of this dirrecory get the extension
-                    if(str[str.length-1].equalsIgnoreCase("F90") )
-                        projectFiles.add(new fortranFile(file,true));
+                    if(str[str.length-1].equalsIgnoreCase("F90") ){
+                        CodeFile cf= new fortranFile(file,true);
+                        projectFiles.add(cf);
+                        addFortranFileToIndexedHashMap(cf);
+                    }
                     else if(str[str.length-1].equalsIgnoreCase("f") || str[str.length-1].equalsIgnoreCase("f77")
                             || str[str.length-1].equalsIgnoreCase("for") || str[str.length-1].equalsIgnoreCase("fpp")
-                            || str[str.length-1].equalsIgnoreCase("ftn"))
-                        projectFiles.add(new fortranFile(file,false));
+                            || str[str.length-1].equalsIgnoreCase("ftn")){
+                        CodeFile cf= new fortranFile(file,false);
+                        projectFiles.add(cf);
+                        addFortranFileToIndexedHashMap(cf);
+                    }
                     else if(str[str.length-1].equalsIgnoreCase("c") || str[str.length-1].equalsIgnoreCase("h") ||
                             str[str.length-1].equalsIgnoreCase("cpp") || str[str.length-1].equalsIgnoreCase("hpp") ||
                             str[str.length-1].equalsIgnoreCase("cc") || str[str.length-1].equalsIgnoreCase("cp") ||
@@ -96,63 +118,67 @@ public class Project implements Serializable {
     }
     
     /**
-     * Copies all Fortran files to home directory of project
-     * in order for icode to analyze them
+     * Add Fortran File to list with the given index
+     * @param cf fortran file
      */
-    public void copyFortranFilesToSiglePlace() throws IOException {
-        for(CodeFile cf: projectFiles){
-            String[] str=cf.file.getName().split("\\.");
-            if(str[str.length-1].equalsIgnoreCase("f") || str[str.length-1].equalsIgnoreCase("f77")
-                            || str[str.length-1].equalsIgnoreCase("for") || str[str.length-1].equalsIgnoreCase("fpp")
-                            || str[str.length-1].equalsIgnoreCase("ftn") || str[str.length-1].equalsIgnoreCase("F90")){
-                fortranDeletedFiles.add(cf);
-                
-                //get parent
-                String parent= cf.file.getParent().split("\\\\")[cf.file.getParent().split("\\\\").length-1];
-                if(!Exa2Pro.isWindows()){
-                    parent= cf.file.getParent().split("/")[cf.file.getParent().split("/").length-1];
+    private void addFortranFileToIndexedHashMap(CodeFile cf){
+        if(credentials.getProjects().size()<2){
+            fortranFilesIndexed.put(countFortran, cf);
+            countFortran++;
+        }else{
+            HashMap<Integer, CodeFile> previousFortranFiles= credentials.getProjects().get(credentials.getProjects().size()-2).getFortranFilesIndexed();
+            boolean found=false;
+            for(Integer key: previousFortranFiles.keySet()){
+                if(previousFortranFiles.get(key).file.getAbsolutePath().equals(cf.file.getAbsolutePath())){
+                    fortranFilesIndexed.put(key, cf);
+                    found=true;
+                    break;
                 }
-                //copy
-                Files.copy(cf.file.toPath(), Paths.get(credentials.getProjectDirectory()+"/temp_fortran_" +parent+"_"+cf.file.getName()));
-                cf.file.delete();
+            }
+            if(!found){
+                fortranFilesIndexed.put(countFortran, cf);
+                countFortran++;
             }
         }
     }
     
-    //Restore official Fortran files
+    /**
+     * Copies all Fortran files to home directory of project
+     * in order for icode to analyze them
+     */
+    public void copyFortranFilesToSiglePlace() throws IOException {
+        for(Integer key: fortranFilesIndexed.keySet()){
+            String[] str= fortranFilesIndexed.get(key).file.getName().split("\\.");
+            Files.copy(fortranFilesIndexed.get(key).file.toPath(), Paths.get(credentials.getProjectDirectory()+"/"+key+"."+str[str.length-1]));
+            fortranFilesIndexed.get(key).file.delete();
+        }
+    }
+    
+    /**
+     * Restore official Fortran files
+     * @throws IOException 
+     */
     public void restoreTempFortranFiles() throws IOException {
         File[] files = new File(credentials.getProjectDirectory()).listFiles();
         if (files != null) { //some JVMs return null for empty dirs
             for (File f : files) {
-                String fName=f.getName();
-                if (fName.startsWith("temp_fortran_")) {
-                    fName= fName.replace("temp_fortran_", "");
-                    for(CodeFile cf: fortranDeletedFiles){
-                        String parent= cf.file.getParent().split("\\\\")[cf.file.getParent().split("\\\\").length-1];
-                        if(!Exa2Pro.isWindows()){
-                            parent= cf.file.getParent().split("/")[cf.file.getParent().split("/").length-1];
-                        }
-                        if((parent+"_"+cf.file.getName()).equals(fName)){
-                            int count=0;
-                            if(parent.contains("_")){
-                                for(char ch: parent.toCharArray()){
-                                    if(ch=='_')
-                                        count++;
-                                }
-                            }
-                            try {
-                            Files.copy(f.toPath(), Paths.get(cf.file.getParent()+"/"+fName.split("_",count+2)[count+1]) );
+                if(f.isFile() && f.getName().contains(".")){
+                    String fName=f.getName().split("\\.")[0];
+                    String fEnding=f.getName().split("\\.")[1];
+                    if(fEnding.equalsIgnoreCase("f90") || fEnding.equalsIgnoreCase("f") || fEnding.equalsIgnoreCase("f77")
+                                || fEnding.equalsIgnoreCase("for") || fEnding.equalsIgnoreCase("fpp")
+                                || fEnding.equalsIgnoreCase("ftn")){
+                        try {
+                            Files.copy(f.toPath(), fortranFilesIndexed.get(Integer.parseInt(fName)).file.toPath());
                             f.delete();
-                            }
-                            catch (NoSuchFileException e) {
-								System.out.println("java.nio.file.NoSuchFileException");
-							}
+                        }
+                        catch (NoSuchFileException e) {
+                            System.out.println("java.nio.file.NoSuchFileException");
                         }
                     }
                 }
             }
         }
-        fortranDeletedFiles.clear();
     }
     
     // Returns true or flase if this projects contains Fortran code
@@ -193,6 +219,12 @@ public class Project implements Serializable {
     }
     public ProjectCredentials getCredentials(){
         return credentials;
+    }
+    public HashMap<Integer, CodeFile> getFortranFilesIndexed(){
+        return fortranFilesIndexed;
+    }
+    public Integer getCountFortran(){
+        return countFortran;
     }
 
     public void setProjectReport(Report projectReport) {

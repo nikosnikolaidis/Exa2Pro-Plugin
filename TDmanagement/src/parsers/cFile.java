@@ -1,6 +1,7 @@
 
 package parsers;
 
+import csvControlers.CSVWriteForClustering;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -103,7 +104,7 @@ public class cFile extends CodeFile{
                         if(!methodsLocDecl.isEmpty()){
                             String[] lineVar= replaceWithSpaces(line).replaceAll("\\(", " ").split(" ");
                             for(String str: lineVar){
-                                if( attributes.contains(str.trim()) ){
+                                if( attributes.contains(str.trim()) && methodName.split(" ").length>1){
                                     attributesInMethods.add(str.trim()+" "+methodName);
                                 }
                             }
@@ -219,7 +220,7 @@ public class cFile extends CodeFile{
             for(String str: allInvocations){
                 for(String str2: methodsLOC.keySet()){
                     String meth= str2.split(" ")[str2.split(" ").length-1];
-                    if(str.split(";")[0].equals(meth)){
+                    if(str.split(";")[0].equals(meth) && str.split(";").length>1){
                         invocations.add(str);
                         break;
                     }
@@ -243,6 +244,18 @@ public class cFile extends CodeFile{
         } catch (IOException ex) {
             Logger.getLogger(cParserSemiLatest.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * export csv for attributes and invocations
+     */
+    @Override
+    public boolean exportCSVofAtribute(){
+        if(!attributesInMethods.isEmpty()){
+            new CSVWriteForClustering(this);
+            return true;
+        }
+        return false;
     }
     
     /**
@@ -302,7 +315,7 @@ public class cFile extends CodeFile{
     }
     
     @Override
-    public void calculateOpportunities(boolean fast){
+    public void calculateOpportunities(boolean fast, String methodName){
         //Deletes previous if exist
         File fileDelPrev = new File("./" + file.getName() + "_parsed.txt");
         if(fileDelPrev.exists())
@@ -322,7 +335,7 @@ public class cFile extends CodeFile{
         
         try {
             ParsedFilesController paFC=new ParsedFilesController();
-            this.opportunities = paFC.calculateOpportunities(fast, file, "c", methodsLocDeclNew);
+            this.opportunities = paFC.calculateOpportunities(fast, file, methodName, "c", methodsLocDeclNew);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(fortranFile.class.getName()).log(Level.SEVERE, null, ex);
         }

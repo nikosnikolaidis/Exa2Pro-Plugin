@@ -1,0 +1,805 @@
+{
+    "parameters": {
+        "project": "metal",
+        "files": 24,
+        "horizon": 3,
+        "regressor": "ridge",
+        "ground_truth": "no"
+    },
+    "change_metrics": [
+        {
+            "ewald.f90": {
+                "file_name": "ewald.f90",
+                "versions": 130,
+                "td_of_last_version": 5520,
+                "complexity_of_last_version": 65,
+                "number_of_changes": 24,
+                "change_proneness_(CP)": 0.18461538461538463,
+                "number_of_td_changes": 14,
+                "change_proneness_td_(CP-TD)": 0.1076923076923077,
+                "number_of_complexity_changes": 19,
+                "change_proneness_complexity_(CP-COMP)": 0.14615384615384616,
+                "expected_size_change_(ED-LOC)": 3.193798449612403,
+                "expected_td_change_(ED-TD)": 25.813953488372093,
+                "expected_complexity_change_(ED-COMP)": 0.26356589147286824
+            }
+        },
+        {
+            "molecule.f90": {
+                "file_name": "molecule.f90",
+                "versions": 130,
+                "td_of_last_version": 10020,
+                "complexity_of_last_version": 87,
+                "number_of_changes": 21,
+                "change_proneness_(CP)": 0.16153846153846155,
+                "number_of_td_changes": 19,
+                "change_proneness_td_(CP-TD)": 0.14615384615384616,
+                "number_of_complexity_changes": 17,
+                "change_proneness_complexity_(CP-COMP)": 0.13076923076923078,
+                "expected_size_change_(ED-LOC)": 12.248062015503876,
+                "expected_td_change_(ED-TD)": 69.53488372093024,
+                "expected_complexity_change_(ED-COMP)": 0.5271317829457365
+            }
+        },
+        {
+            "coulomb_lr.f90": {
+                "file_name": "coulomb_lr.f90",
+                "versions": 125,
+                "td_of_last_version": 9750,
+                "complexity_of_last_version": 63,
+                "number_of_changes": 20,
+                "change_proneness_(CP)": 0.16,
+                "number_of_td_changes": 18,
+                "change_proneness_td_(CP-TD)": 0.144,
+                "number_of_complexity_changes": 10,
+                "change_proneness_complexity_(CP-COMP)": 0.08,
+                "expected_size_change_(ED-LOC)": 3.096774193548387,
+                "expected_td_change_(ED-TD)": 31.93548387096774,
+                "expected_complexity_change_(ED-COMP)": 0.2903225806451613
+            }
+        },
+        {
+            "cg.f90": {
+                "file_name": "cg.f90",
+                "versions": 130,
+                "td_of_last_version": 1350,
+                "complexity_of_last_version": 34,
+                "number_of_changes": 17,
+                "change_proneness_(CP)": 0.13076923076923078,
+                "number_of_td_changes": 14,
+                "change_proneness_td_(CP-TD)": 0.1076923076923077,
+                "number_of_complexity_changes": 7,
+                "change_proneness_complexity_(CP-COMP)": 0.05384615384615385,
+                "expected_size_change_(ED-LOC)": 1.821705426356589,
+                "expected_td_change_(ED-TD)": 4.651162790697675,
+                "expected_complexity_change_(ED-COMP)": 0.20155038759689922
+            }
+        },
+        {
+            "coulomb_sr.f90": {
+                "file_name": "coulomb_sr.f90",
+                "versions": 125,
+                "td_of_last_version": 2280,
+                "complexity_of_last_version": 14,
+                "number_of_changes": 16,
+                "change_proneness_(CP)": 0.128,
+                "number_of_td_changes": 13,
+                "change_proneness_td_(CP-TD)": 0.104,
+                "number_of_complexity_changes": 7,
+                "change_proneness_complexity_(CP-COMP)": 0.056,
+                "expected_size_change_(ED-LOC)": -3.620967741935484,
+                "expected_td_change_(ED-TD)": -36.774193548387096,
+                "expected_complexity_change_(ED-COMP)": -0.3225806451612903
+            }
+        },
+        {
+            "electrode_parameters.f90": {
+                "file_name": "electrode_parameters.f90",
+                "versions": 106,
+                "td_of_last_version": 2100,
+                "complexity_of_last_version": 16,
+                "number_of_changes": 12,
+                "change_proneness_(CP)": 0.11320754716981132,
+                "number_of_td_changes": 13,
+                "change_proneness_td_(CP-TD)": 0.12264150943396226,
+                "number_of_complexity_changes": 11,
+                "change_proneness_complexity_(CP-COMP)": 0.10377358490566038,
+                "expected_size_change_(ED-LOC)": 0.6571428571428571,
+                "expected_td_change_(ED-TD)": 1.4285714285714286,
+                "expected_complexity_change_(ED-COMP)": 0.0380952380952381
+            }
+        },
+        {
+            "coulomb_self.f90": {
+                "file_name": "coulomb_self.f90",
+                "versions": 125,
+                "td_of_last_version": 3000,
+                "complexity_of_last_version": 17,
+                "number_of_changes": 13,
+                "change_proneness_(CP)": 0.104,
+                "number_of_td_changes": 12,
+                "change_proneness_td_(CP-TD)": 0.096,
+                "number_of_complexity_changes": 5,
+                "change_proneness_complexity_(CP-COMP)": 0.04,
+                "expected_size_change_(ED-LOC)": 1.9758064516129032,
+                "expected_td_change_(ED-TD)": 18.14516129032258,
+                "expected_complexity_change_(ED-COMP)": 0.10483870967741936
+            }
+        },
+        {
+            "localwork.f90": {
+                "file_name": "localwork.f90",
+                "versions": 129,
+                "td_of_last_version": 7350,
+                "complexity_of_last_version": 100,
+                "number_of_changes": 13,
+                "change_proneness_(CP)": 0.10077519379844961,
+                "number_of_td_changes": 12,
+                "change_proneness_td_(CP-TD)": 0.09302325581395349,
+                "number_of_complexity_changes": 12,
+                "change_proneness_complexity_(CP-COMP)": 0.09302325581395349,
+                "expected_size_change_(ED-LOC)": 1.0,
+                "expected_td_change_(ED-TD)": -6.5625,
+                "expected_complexity_change_(ED-COMP)": 0.3828125
+            }
+        },
+        {
+            "electrode.f90": {
+                "file_name": "electrode.f90",
+                "versions": 130,
+                "td_of_last_version": 900,
+                "complexity_of_last_version": 11,
+                "number_of_changes": 12,
+                "change_proneness_(CP)": 0.09230769230769231,
+                "number_of_td_changes": 13,
+                "change_proneness_td_(CP-TD)": 0.1,
+                "number_of_complexity_changes": 11,
+                "change_proneness_complexity_(CP-COMP)": 0.08461538461538462,
+                "expected_size_change_(ED-LOC)": 0.5581395348837209,
+                "expected_td_change_(ED-TD)": 2.7906976744186047,
+                "expected_complexity_change_(ED-COMP)": 0.046511627906976744
+            }
+        },
+        {
+            "ion.f90": {
+                "file_name": "ion.f90",
+                "versions": 130,
+                "td_of_last_version": 720,
+                "complexity_of_last_version": 12,
+                "number_of_changes": 10,
+                "change_proneness_(CP)": 0.07692307692307693,
+                "number_of_td_changes": 7,
+                "change_proneness_td_(CP-TD)": 0.05384615384615385,
+                "number_of_complexity_changes": 2,
+                "change_proneness_complexity_(CP-COMP)": 0.015384615384615385,
+                "expected_size_change_(ED-LOC)": 0.40310077519379844,
+                "expected_td_change_(ED-TD)": 0.6976744186046512,
+                "expected_complexity_change_(ED-COMP)": 0.023255813953488372
+            }
+        },
+        {
+            "algorithms.f90": {
+                "file_name": "algorithms.f90",
+                "versions": 127,
+                "td_of_last_version": 1080,
+                "complexity_of_last_version": 12,
+                "number_of_changes": 9,
+                "change_proneness_(CP)": 0.07086614173228346,
+                "number_of_td_changes": 7,
+                "change_proneness_td_(CP-TD)": 0.05511811023622047,
+                "number_of_complexity_changes": 8,
+                "change_proneness_complexity_(CP-COMP)": 0.06299212598425197,
+                "expected_size_change_(ED-LOC)": 0.8015873015873016,
+                "expected_td_change_(ED-TD)": 5.238095238095238,
+                "expected_complexity_change_(ED-COMP)": 0.06349206349206349
+            }
+        },
+        {
+            "timers.f90": {
+                "file_name": "timers.f90",
+                "versions": 130,
+                "td_of_last_version": 10530,
+                "complexity_of_last_version": 27,
+                "number_of_changes": 9,
+                "change_proneness_(CP)": 0.06923076923076923,
+                "number_of_td_changes": 9,
+                "change_proneness_td_(CP-TD)": 0.06923076923076923,
+                "number_of_complexity_changes": 4,
+                "change_proneness_complexity_(CP-COMP)": 0.03076923076923077,
+                "expected_size_change_(ED-LOC)": 1.9844961240310077,
+                "expected_td_change_(ED-TD)": 43.25581395348837,
+                "expected_complexity_change_(ED-COMP)": 0.10077519379844961
+            }
+        },
+        {
+            "thermostat.f90": {
+                "file_name": "thermostat.f90",
+                "versions": 130,
+                "td_of_last_version": 3810,
+                "complexity_of_last_version": 42,
+                "number_of_changes": 9,
+                "change_proneness_(CP)": 0.06923076923076923,
+                "number_of_td_changes": 12,
+                "change_proneness_td_(CP-TD)": 0.09230769230769231,
+                "number_of_complexity_changes": 9,
+                "change_proneness_complexity_(CP-COMP)": 0.06923076923076923,
+                "expected_size_change_(ED-LOC)": 1.4573643410852712,
+                "expected_td_change_(ED-TD)": 12.093023255813954,
+                "expected_complexity_change_(ED-COMP)": 0.18604651162790697
+            }
+        },
+        {
+            "version.F90": {
+                "file_name": "version.F90",
+                "versions": 127,
+                "td_of_last_version": 750,
+                "complexity_of_last_version": 1,
+                "number_of_changes": 8,
+                "change_proneness_(CP)": 0.06299212598425197,
+                "number_of_td_changes": 8,
+                "change_proneness_td_(CP-TD)": 0.06299212598425197,
+                "number_of_complexity_changes": 1,
+                "change_proneness_complexity_(CP-COMP)": 0.007874015748031496,
+                "expected_size_change_(ED-LOC)": 0.05555555555555555,
+                "expected_td_change_(ED-TD)": 0.47619047619047616,
+                "expected_complexity_change_(ED-COMP)": 0.0
+            }
+        },
+        {
+            "configuration_line.f90": {
+                "file_name": "configuration_line.f90",
+                "versions": 130,
+                "td_of_last_version": 2220,
+                "complexity_of_last_version": 30,
+                "number_of_changes": 8,
+                "change_proneness_(CP)": 0.06153846153846154,
+                "number_of_td_changes": 11,
+                "change_proneness_td_(CP-TD)": 0.08461538461538462,
+                "number_of_complexity_changes": 4,
+                "change_proneness_complexity_(CP-COMP)": 0.03076923076923077,
+                "expected_size_change_(ED-LOC)": 0.5193798449612403,
+                "expected_td_change_(ED-TD)": -0.9302325581395349,
+                "expected_complexity_change_(ED-COMP)": 0.05426356589147287
+            }
+        },
+        {
+            "gen_git_info.sh": {
+                "file_name": "gen_git_info.sh",
+                "versions": 110,
+                "td_of_last_version": 450,
+                "complexity_of_last_version": 1,
+                "number_of_changes": 6,
+                "change_proneness_(CP)": 0.05454545454545454,
+                "number_of_td_changes": 6,
+                "change_proneness_td_(CP-TD)": 0.05454545454545454,
+                "number_of_complexity_changes": 5,
+                "change_proneness_complexity_(CP-COMP)": 0.045454545454545456,
+                "expected_size_change_(ED-LOC)": -0.045871559633027525,
+                "expected_td_change_(ED-TD)": -2.477064220183486,
+                "expected_complexity_change_(ED-COMP)": -0.009174311926605505
+            }
+        },
+        {
+            "rattle.f90": {
+                "file_name": "rattle.f90",
+                "versions": 130,
+                "td_of_last_version": 870,
+                "complexity_of_last_version": 7,
+                "number_of_changes": 6,
+                "change_proneness_(CP)": 0.046153846153846156,
+                "number_of_td_changes": 5,
+                "change_proneness_td_(CP-TD)": 0.038461538461538464,
+                "number_of_complexity_changes": 3,
+                "change_proneness_complexity_(CP-COMP)": 0.023076923076923078,
+                "expected_size_change_(ED-LOC)": -1.0852713178294573,
+                "expected_td_change_(ED-TD)": -7.441860465116279,
+                "expected_complexity_change_(ED-COMP)": -0.05426356589147287
+            }
+        },
+        {
+            "box.f90": {
+                "file_name": "box.f90",
+                "versions": 130,
+                "td_of_last_version": 1350,
+                "complexity_of_last_version": 10,
+                "number_of_changes": 5,
+                "change_proneness_(CP)": 0.038461538461538464,
+                "number_of_td_changes": 5,
+                "change_proneness_td_(CP-TD)": 0.038461538461538464,
+                "number_of_complexity_changes": 4,
+                "change_proneness_complexity_(CP-COMP)": 0.03076923076923077,
+                "expected_size_change_(ED-LOC)": -0.4728682170542636,
+                "expected_td_change_(ED-TD)": -1.627906976744186,
+                "expected_complexity_change_(ED-COMP)": -0.05426356589147287
+            }
+        },
+        {
+            "kinds.F90": {
+                "file_name": "kinds.F90",
+                "versions": 127,
+                "td_of_last_version": 3030,
+                "complexity_of_last_version": 18,
+                "number_of_changes": 4,
+                "change_proneness_(CP)": 0.031496062992125984,
+                "number_of_td_changes": 4,
+                "change_proneness_td_(CP-TD)": 0.031496062992125984,
+                "number_of_complexity_changes": 1,
+                "change_proneness_complexity_(CP-COMP)": 0.007874015748031496,
+                "expected_size_change_(ED-LOC)": 0.0873015873015873,
+                "expected_td_change_(ED-TD)": 0.23809523809523808,
+                "expected_complexity_change_(ED-COMP)": 0.0
+            }
+        },
+        {
+            "swap_indices.sh": {
+                "file_name": "swap_indices.sh",
+                "versions": 128,
+                "td_of_last_version": 960,
+                "complexity_of_last_version": 5,
+                "number_of_changes": 4,
+                "change_proneness_(CP)": 0.03125,
+                "number_of_td_changes": 4,
+                "change_proneness_td_(CP-TD)": 0.03125,
+                "number_of_complexity_changes": 4,
+                "change_proneness_complexity_(CP-COMP)": 0.03125,
+                "expected_size_change_(ED-LOC)": -0.10236220472440945,
+                "expected_td_change_(ED-TD)": 0.9448818897637795,
+                "expected_complexity_change_(ED-COMP)": -0.031496062992125984
+            }
+        },
+        {
+            "mw_utils.py": {
+                "file_name": "mw_utils.py",
+                "versions": 100,
+                "td_of_last_version": 35,
+                "complexity_of_last_version": 35,
+                "number_of_changes": 3,
+                "change_proneness_(CP)": 0.03,
+                "number_of_td_changes": 3,
+                "change_proneness_td_(CP-TD)": 0.03,
+                "number_of_complexity_changes": 2,
+                "change_proneness_complexity_(CP-COMP)": 0.02,
+                "expected_size_change_(ED-LOC)": 0.31313131313131315,
+                "expected_td_change_(ED-TD)": 0.0,
+                "expected_complexity_change_(ED-COMP)": 0.1717171717171717
+            }
+        },
+        {
+            "diagnostic.f90": {
+                "file_name": "diagnostic.f90",
+                "versions": 105,
+                "td_of_last_version": 990,
+                "complexity_of_last_version": 12,
+                "number_of_changes": 3,
+                "change_proneness_(CP)": 0.02857142857142857,
+                "number_of_td_changes": 1,
+                "change_proneness_td_(CP-TD)": 0.009523809523809525,
+                "number_of_complexity_changes": 2,
+                "change_proneness_complexity_(CP-COMP)": 0.01904761904761905,
+                "expected_size_change_(ED-LOC)": 0.18269230769230768,
+                "expected_td_change_(ED-TD)": 0.0,
+                "expected_complexity_change_(ED-COMP)": 0.019230769230769232
+            }
+        },
+        {
+            "velocity.f90": {
+                "file_name": "velocity.f90",
+                "versions": 120,
+                "td_of_last_version": 3390,
+                "complexity_of_last_version": 65,
+                "number_of_changes": 3,
+                "change_proneness_(CP)": 0.025,
+                "number_of_td_changes": 3,
+                "change_proneness_td_(CP-TD)": 0.025,
+                "number_of_complexity_changes": 2,
+                "change_proneness_complexity_(CP-COMP)": 0.016666666666666666,
+                "expected_size_change_(ED-LOC)": 0.48739495798319327,
+                "expected_td_change_(ED-TD)": 0.0,
+                "expected_complexity_change_(ED-COMP)": -0.008403361344537815
+            }
+        },
+        {
+            "fetch_time_scaling.sh": {
+                "file_name": "fetch_time_scaling.sh",
+                "versions": 103,
+                "td_of_last_version": 1020,
+                "complexity_of_last_version": 5,
+                "number_of_changes": 2,
+                "change_proneness_(CP)": 0.019417475728155338,
+                "number_of_td_changes": 2,
+                "change_proneness_td_(CP-TD)": 0.019417475728155338,
+                "number_of_complexity_changes": 2,
+                "change_proneness_complexity_(CP-COMP)": 0.019417475728155338,
+                "expected_size_change_(ED-LOC)": 0.0784313725490196,
+                "expected_td_change_(ED-TD)": 2.0588235294117645,
+                "expected_complexity_change_(ED-COMP)": 0.0196078431372549
+            }
+        }
+    ],
+    "forecasts": [
+        {
+            "ewald.f90": [
+                {
+                    "version": 131,
+                    "value": 5486.501606130593
+                },
+                {
+                    "version": 132,
+                    "value": 5475.523640204735
+                },
+                {
+                    "version": 133,
+                    "value": 5472.128982720548
+                }
+            ]
+        },
+        {
+            "molecule.f90": [
+                {
+                    "version": 131,
+                    "value": 10012.220234758006
+                },
+                {
+                    "version": 132,
+                    "value": 10019.179965628715
+                },
+                {
+                    "version": 133,
+                    "value": 10024.697193235002
+                }
+            ]
+        },
+        {
+            "coulomb_lr.f90": [
+                {
+                    "version": 126,
+                    "value": 9707.168740971052
+                },
+                {
+                    "version": 127,
+                    "value": 9730.742526632697
+                },
+                {
+                    "version": 128,
+                    "value": 9628.503669301646
+                }
+            ]
+        },
+        {
+            "cg.f90": [
+                {
+                    "version": 131,
+                    "value": 1421.375660898511
+                },
+                {
+                    "version": 132,
+                    "value": 1424.0013422294555
+                },
+                {
+                    "version": 133,
+                    "value": 1423.4352555607795
+                }
+            ]
+        },
+        {
+            "coulomb_sr.f90": [
+                {
+                    "version": 126,
+                    "value": 2268.672818726849
+                },
+                {
+                    "version": 127,
+                    "value": 2249.4831350978184
+                },
+                {
+                    "version": 128,
+                    "value": 2196.364140059144
+                }
+            ]
+        },
+        {
+            "electrode_parameters.f90": [
+                {
+                    "version": 107,
+                    "value": 2098.287929747486
+                },
+                {
+                    "version": 108,
+                    "value": 2099.980113164509
+                },
+                {
+                    "version": 109,
+                    "value": 2099.589869002556
+                }
+            ]
+        },
+        {
+            "coulomb_self.f90": [
+                {
+                    "version": 126,
+                    "value": 2995.1290208236337
+                },
+                {
+                    "version": 127,
+                    "value": 2920.3059690895334
+                },
+                {
+                    "version": 128,
+                    "value": 2891.2142046524864
+                }
+            ]
+        },
+        {
+            "localwork.f90": [
+                {
+                    "version": 130,
+                    "value": 7348.794946117123
+                },
+                {
+                    "version": 131,
+                    "value": 7354.48854434721
+                },
+                {
+                    "version": 132,
+                    "value": 7357.208945556991
+                }
+            ]
+        },
+        {
+            "electrode.f90": [
+                {
+                    "version": 131,
+                    "value": 909.4867917988727
+                },
+                {
+                    "version": 132,
+                    "value": 907.4277287915565
+                },
+                {
+                    "version": 133,
+                    "value": 913.5228149583096
+                }
+            ]
+        },
+        {
+            "ion.f90": [
+                {
+                    "version": 131,
+                    "value": 721.4607972977603
+                },
+                {
+                    "version": 132,
+                    "value": 721.4679668101571
+                },
+                {
+                    "version": 133,
+                    "value": 721.3166664724669
+                }
+            ]
+        },
+        {
+            "algorithms.f90": [
+                {
+                    "version": 128,
+                    "value": 1080.679574862877
+                },
+                {
+                    "version": 129,
+                    "value": 1081.4876678256078
+                },
+                {
+                    "version": 130,
+                    "value": 1083.261447319684
+                }
+            ]
+        },
+        {
+            "timers.f90": [
+                {
+                    "version": 131,
+                    "value": 10533.611283910184
+                },
+                {
+                    "version": 132,
+                    "value": 10537.989739477449
+                },
+                {
+                    "version": 133,
+                    "value": 10542.504483256162
+                }
+            ]
+        },
+        {
+            "thermostat.f90": [
+                {
+                    "version": 131,
+                    "value": 3808.327438351416
+                },
+                {
+                    "version": 132,
+                    "value": 3809.5331651393653
+                },
+                {
+                    "version": 133,
+                    "value": 3809.7623784685175
+                }
+            ]
+        },
+        {
+            "version.F90": [
+                {
+                    "version": 128,
+                    "value": 750.523126708059
+                },
+                {
+                    "version": 129,
+                    "value": 750.2390511535502
+                },
+                {
+                    "version": 130,
+                    "value": 750.2991856739877
+                }
+            ]
+        },
+        {
+            "configuration_line.f90": [
+                {
+                    "version": 131,
+                    "value": 2227.524663430533
+                },
+                {
+                    "version": 132,
+                    "value": 2230.901423214088
+                },
+                {
+                    "version": 133,
+                    "value": 2234.391136158722
+                }
+            ]
+        },
+        {
+            "gen_git_info.sh": [
+                {
+                    "version": 111,
+                    "value": 552.5101637467167
+                },
+                {
+                    "version": 112,
+                    "value": 654.7080399422118
+                },
+                {
+                    "version": 113,
+                    "value": 794.6911642287328
+                }
+            ]
+        },
+        {
+            "rattle.f90": [
+                {
+                    "version": 131,
+                    "value": 826.7486817793983
+                },
+                {
+                    "version": 132,
+                    "value": 878.07144880171
+                },
+                {
+                    "version": 133,
+                    "value": 878.664379803201
+                }
+            ]
+        },
+        {
+            "box.f90": [
+                {
+                    "version": 131,
+                    "value": 1355.0754367208337
+                },
+                {
+                    "version": 132,
+                    "value": 1348.958776115123
+                },
+                {
+                    "version": 133,
+                    "value": 1344.448186184376
+                }
+            ]
+        },
+        {
+            "kinds.F90": [
+                {
+                    "version": 128,
+                    "value": 3030.1858160315
+                },
+                {
+                    "version": 129,
+                    "value": 3030.122084833598
+                },
+                {
+                    "version": 130,
+                    "value": 3030.1186708863574
+                }
+            ]
+        },
+        {
+            "swap_indices.sh": [
+                {
+                    "version": 129,
+                    "value": 960.6601619029949
+                },
+                {
+                    "version": 130,
+                    "value": 960.4276281309357
+                },
+                {
+                    "version": 131,
+                    "value": 960.4064352241111
+                }
+            ]
+        },
+        {
+            "mw_utils.py": [
+                {
+                    "version": 101,
+                    "value": 35.00046419714436
+                },
+                {
+                    "version": 102,
+                    "value": 34.999999988466485
+                },
+                {
+                    "version": 103,
+                    "value": 35.00397100725191
+                }
+            ]
+        },
+        {
+            "diagnostic.f90": [
+                {
+                    "version": 106,
+                    "value": 990.0
+                },
+                {
+                    "version": 107,
+                    "value": 990.0
+                },
+                {
+                    "version": 108,
+                    "value": 990.0
+                }
+            ]
+        },
+        {
+            "velocity.f90": [
+                {
+                    "version": 121,
+                    "value": 3389.999999996882
+                },
+                {
+                    "version": 122,
+                    "value": 3389.9999999937017
+                },
+                {
+                    "version": 123,
+                    "value": 3389.9999999904585
+                }
+            ]
+        },
+        {
+            "fetch_time_scaling.sh": [
+                {
+                    "version": 104,
+                    "value": 1020.0000000000002
+                },
+                {
+                    "version": 105,
+                    "value": 1019.9999999999999
+                },
+                {
+                    "version": 106,
+                    "value": 1020.0000000000002
+                }
+            ]
+        }
+    ]
+}

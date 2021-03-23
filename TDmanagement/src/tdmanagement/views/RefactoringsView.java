@@ -3,6 +3,7 @@ package tdmanagement.views;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
 
+import exa2pro.Exa2Pro;
 import tdmanagement.Activator;
 import tdmanagement.handlers.LoadLastHandler;
 import tdmanagement.handlers.SampleHandler;
@@ -25,6 +26,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.SWT;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -365,7 +367,7 @@ public class RefactoringsView extends ViewPart {
 
 		doubleClickAction = new Action() {
 			public void run() {
-				if (colLCOL != null) {
+				if (colLCOL != null || colCC != null) {
 					// show message
 					IStructuredSelection selection = viewer.getStructuredSelection();
 					Object obj = selection.getFirstElement();
@@ -399,12 +401,66 @@ public class RefactoringsView extends ViewPart {
 
 						// Add new results
 						temp.parse();
-						temp.calculateOpportunities(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_BOOLEANopport));
-						
-						
+						temp.calculateOpportunities(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_BOOLEANopport),
+								obj.toString().split("\\.")[obj.toString().split("\\.").length - 1]);
 						
 						OpportunitiesView.array = temp.opportunities;
+						OpportunitiesView.split = true;
 						OpportunitiesView.addElementsToTable();
+					}
+				}
+				else if (colCBF != null || colLOC != null || colLCOP != null) {
+					// show message
+					IStructuredSelection selection = viewer.getStructuredSelection();
+					Object obj = selection.getFirstElement();
+					showMessage("Opportunity detection for " + obj.toString());
+
+					//Get Project Files
+					ArrayList<CodeFile> projectFiles;
+					if(SampleHandler.p!=null) {
+						projectFiles= SampleHandler.p.getprojectFiles();
+					}
+					else {
+						projectFiles= LoadLastHandler.p.getprojectFiles();
+					}
+					
+					// calculate Opportunities
+					CodeFile temp = null;
+					for (CodeFile cf : projectFiles) {
+						if ((obj.toString().split("\\.")[0]+"."+obj.toString().split("\\.")[1]).equals(cf.file.getName())) {
+							temp = cf;
+						}
+					}
+
+					//temp.parse();
+					if (temp != null && temp.exportCSVofAtribute() && !PreferenceConstants.P_PATH_Clustering.equals("")) {
+						// Open Opportunities View
+						try {
+							PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+									.showView("tdmanagement.views.OpportunitiesView");
+						} catch (PartInitException e) {
+							e.printStackTrace();
+						}
+						
+						//preferences 
+				    	Exa2Pro.ClusteringPath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_Clustering);
+				    	Exa2Pro.pythonRun= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_STRING_PYTHON);
+				    	
+						// Add new results
+			            ArrayList<String> clusters= temp.runClustering(
+			            		Double.parseDouble(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_Number_ClusteringThreshold)) );
+						OpportunitiesView.array = clusters;
+						OpportunitiesView.split = false;
+						OpportunitiesView.addElementsToTable();
+
+						//delete previous .csv files
+			            File directory = new File(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_Clustering));
+			            File[] fList = directory.listFiles();
+			            for (File tempCSV : fList) {
+			                if (tempCSV.isFile() && !tempCSV.getName().endsWith(".py")){
+			                	tempCSV.delete();
+			                }
+			            }
 					}
 				}
 			}

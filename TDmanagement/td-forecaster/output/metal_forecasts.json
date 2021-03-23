@@ -1,0 +1,132 @@
+{
+    "parameters": {
+        "project": "metal",
+        "horizon": 10,
+        "regressor": "ridge",
+        "ground_truth": "yes"
+    },
+    "forecasts": [
+        {
+            "version": 21,
+            "value": 3.0
+        },
+        {
+            "version": 22,
+            "value": 3.0
+        },
+        {
+            "version": 23,
+            "value": 3.0
+        },
+        {
+            "version": 24,
+            "value": 3.0
+        },
+        {
+            "version": 25,
+            "value": 3.0
+        },
+        {
+            "version": 26,
+            "value": 3.0
+        },
+        {
+            "version": 27,
+            "value": 3.0
+        },
+        {
+            "version": 28,
+            "value": 3.0
+        },
+        {
+            "version": 29,
+            "value": 3.0
+        },
+        {
+            "version": 30,
+            "value": 3.0
+        }
+    ],
+    "ground_truth": [
+        {
+            "version": 1,
+            "value": 3.0
+        },
+        {
+            "version": 2,
+            "value": 3.0
+        },
+        {
+            "version": 3,
+            "value": 3.0
+        },
+        {
+            "version": 4,
+            "value": 3.0
+        },
+        {
+            "version": 5,
+            "value": 3.0
+        },
+        {
+            "version": 6,
+            "value": 3.0
+        },
+        {
+            "version": 7,
+            "value": 3.0
+        },
+        {
+            "version": 8,
+            "value": 3.0
+        },
+        {
+            "version": 9,
+            "value": 3.0
+        },
+        {
+            "version": 10,
+            "value": 3.0
+        },
+        {
+            "version": 11,
+            "value": 3.0
+        },
+        {
+            "version": 12,
+            "value": 3.0
+        },
+        {
+            "version": 13,
+            "value": 3.0
+        },
+        {
+            "version": 14,
+            "value": 3.0
+        },
+        {
+            "version": 15,
+            "value": 3.0
+        },
+        {
+            "version": 16,
+            "value": 3.0
+        },
+        {
+            "version": 17,
+            "value": 3.0
+        },
+        {
+            "version": 18,
+            "value": 3.0
+        },
+        {
+            "version": 19,
+            "value": 3.0
+        },
+        {
+            "version": 20,
+            "value": 3.0
+        }
+    ]
+}

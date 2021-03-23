@@ -8,6 +8,8 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
 
+import java.text.DecimalFormat;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -76,6 +78,11 @@ public class SampleHandler extends AbstractHandler {
 	    	Exa2Pro.sonarURL= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_STRING_URL);
 	    	Exa2Pro.iCodePath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_iCode);
 	    	Exa2Pro.sonarScannerPath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_SonarScanner);
+	    	Exa2Pro.TDForecasterPath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_Forecaster);
+	    	Exa2Pro.ClusteringPath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_Clustering);
+	    	Exa2Pro.pythonRun= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_STRING_PYTHON);
+	    	if(Exa2Pro.isWindows())
+	    		Exa2Pro.Dos2UnixPath= Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PATH_Dos2Unix);
 	    	
 	    	//Create Project
 	    	boolean exists= false;
@@ -119,55 +126,37 @@ public class SampleHandler extends AbstractHandler {
 		        		System.out.println(e);
 		        	}
 		        	
-		            for(Issue i: p.getprojectReport().getIssuesList()){
-		            	//ToDo!!
-		            	//temp_fortran_src_file.f -> src_file.f 
-		            	//search each time for ifile with one less "xxx_"
-		            	String tempName= i.getIssueDirectory().split(":")[1].replace("temp_fortran_", "")
-		            								.replace((p.getCredentials().getProjectName()+"_"), "");
-						for(CodeFile cf: p.getprojectFiles()) {
-							if(cf.file.getAbsolutePath().endsWith(i.getIssueDirectory().split(":")[1].replaceAll("/", "\\\\"))
-									|| (
-									cf.file.getName().equals(tempName) ) ) {
-				            	///** add markers **///
-								IPath locationIssue = Path.fromOSString(cf.file.getAbsolutePath());
-								IFile ifile = workspace.getRoot().getFileForLocation(locationIssue);
-								IMarker marker = null;
-								try {
-									marker = ifile.createMarker("com.ibm.mymarkers.mymarker");
-									marker.setAttribute(IMarker.MESSAGE, i.getIssueDebt() +"  "+ i.getIssueName() );
-									marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(i.getIssueStartLine()) );
-									marker.setAttribute(IMarker.TEXT, i.getIssueName());
-									if( i.getIssueSeverity().equals("INFO")  )
-										marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
-									else if( i.getIssueSeverity().equals("MINOR") || i.getIssueSeverity().equals("MAJOR") )
-										marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-									else 
-										marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-								} catch (CoreException e) {
-									e.printStackTrace();
+		        	for(Issue i: p.getprojectReport().getIssuesList()){
+		            	String[] nameFile= i.getIssueDirectory().split(":")[1].split("\\.");
+		                if(nameFile[nameFile.length-1].equalsIgnoreCase("f90") || nameFile[nameFile.length-1].equalsIgnoreCase("f") 
+		                				|| nameFile[nameFile.length-1].equalsIgnoreCase("f77") || nameFile[nameFile.length-1].equalsIgnoreCase("for") 
+		                                || nameFile[nameFile.length-1].equalsIgnoreCase("fpp") || nameFile[nameFile.length-1].equalsIgnoreCase("ftn")){
+		                    CodeFile cf= p.getFortranFilesIndexed().get(Integer.parseInt(nameFile[0]));
+		                    ///** add markers **///
+		                    addMarker(workspace, i, cf);
+		                }
+		                else {
+		                	for(CodeFile cf: p.getprojectFiles()) {
+								if(cf.file.getAbsolutePath().endsWith(i.getIssueDirectory().split(":")[1].replaceAll("/", "\\\\"))) {
+					            	///** add markers **///
+									addMarker(workspace, i, cf);
 								}
-								///** add markers **///
 							}
-						}
+		                }
 		            }
 		            
 		        }
 	    	}
 
-
-	    	//Forecasting View
+            //Charts
 	    	try {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("tdmanagement.views.Forecasting");
 			} catch (PartInitException e) {
 				e.printStackTrace();
 			}
-            
             Forecasting.project=p;
             Forecasting.build();
-	    	
-	    	
-            //Charts
+            
             try {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("tdmanagement.views.ChartView");
 			} catch (PartInitException e) {
@@ -192,9 +181,53 @@ public class SampleHandler extends AbstractHandler {
 	    	
 	    	// Metrics
 	    	//Remove Previous content and add new results 
+            DecimalFormat round = new DecimalFormat("#,###.#");
 	    	MetricsView.removePrev();
+	    	//set array for file files
 	    	MetricsView.array=p.getprojectFiles();
-	    	MetricsView.addElementsToTableFile();
+	    	//set arrayOverview for overview metrics
+	    	MetricsView.arrayOverview.put("Technical Debt", p.getprojectReport().getTotalDebt());
+	    	MetricsView.arrayOverview.put("Source Code Debt", round.format(p.getprojectReport().getTDPrincipalSourceCodeDebt()) + " €");
+	    	MetricsView.arrayOverview.put("Design Debt", round.format(p.getprojectReport().getTDPrincipalDesignDebt()) + " €");
+	        if(p.getprojectReport().getTotalTDInterest()!=0)
+	        	MetricsView.arrayOverview.put("TD Interest", round.format(p.getprojectReport().getTotalTDInterest()) + " €");
+	        else
+	        	MetricsView.arrayOverview.put("TD Interest", "-");
+	    	MetricsView.arrayOverview.put("Code Smells", p.getprojectReport().getTotalCodeSmells()+"");
+	    	//system metrics
+	    	double sumLOC=0;
+	        int sumLCOP=0;
+	        int countNonUndif=0;
+	        int sumCC=0;
+	        int sumLCOL=0;
+	        int sumFO=0;
+	        int c=0;
+	        for(CodeFile cf: p.getprojectFiles()){
+	            sumLOC+= cf.totalLines;
+	            sumFO+= cf.fanOut;
+	            if(cf.lcop!=-1){
+	                sumLCOP+= cf.lcop;
+	                countNonUndif++;
+	            }
+	            for (Map.Entry<String, Integer> entry : cf.methodsCC.entrySet()) {
+	                sumCC+= entry.getValue();
+	                c++;
+	            }
+	            for (Map.Entry<String, Double> entry : cf.methodsLCOL.entrySet()) {
+	                sumLCOL+= entry.getValue();
+	            }
+	        }
+	        DecimalFormat df = new DecimalFormat("#.#");
+	        MetricsView.arrayOverview.put("CC", df.format(sumCC*1.0/c) +"");
+	        MetricsView.arrayOverview.put("LCOL", df.format(sumLCOL*1.0/c) +"");
+	        MetricsView.arrayOverview.put("CBF", df.format(sumFO*1.0/p.getprojectFiles().size()) +"");
+	        MetricsView.arrayOverview.put("LOC", df.format(sumLOC/p.getprojectFiles().size()) +"");
+	        if(countNonUndif==0)
+	        	MetricsView.arrayOverview.put("LCOP", "-");
+	        else
+	        	MetricsView.arrayOverview.put("LCOP", df.format(sumLCOP/countNonUndif) +"");
+	    	//set default table
+	    	MetricsView.addElementsToTableOverview();
 	    	
 	    	
 	    	// Refactorings
@@ -257,11 +290,31 @@ public class SampleHandler extends AbstractHandler {
 	        RefactoringsView.arrayCBF= sortedFanOut;
 	        
 	    	RefactoringsView.addElementsToTableFileCBF();
-	    	
 	    }
 		
 		
 		return null;
+	}
+
+
+	private void addMarker(IWorkspace workspace, Issue i, CodeFile cf) {
+		IPath locationIssue = Path.fromOSString(cf.file.getAbsolutePath());
+		IFile ifile = workspace.getRoot().getFileForLocation(locationIssue);
+		IMarker marker = null;
+		try {
+			marker = ifile.createMarker("com.ibm.mymarkers.mymarker");
+			marker.setAttribute(IMarker.MESSAGE, i.getIssueDebt() +"  "+ i.getIssueName() );
+			marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(i.getIssueStartLine()) );
+			marker.setAttribute(IMarker.TEXT, i.getIssueName());
+			if( i.getIssueSeverity().equals("INFO")  )
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
+			else if( i.getIssueSeverity().equals("MINOR") || i.getIssueSeverity().equals("MAJOR") )
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+			else 
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 	
 

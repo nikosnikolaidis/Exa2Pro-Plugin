@@ -48,7 +48,7 @@ public class PieChart extends ApplicationFrame {
         int p=0;
         int total=0;
         
-            if (metric.equals("FanOut")){
+            if (metric.equals("CBF")){
                 System.out.println("FO threshold: "+threshold);
                 for(CodeFile cf: project.getprojectFiles()){
                     if(cf.fanOut>threshold)

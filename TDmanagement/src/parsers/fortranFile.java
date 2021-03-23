@@ -135,7 +135,8 @@ public class fortranFile extends CodeFile{
                         
                         
                         // For start count LOC in function/subroutine
-                        if( lineTable[0].equalsIgnoreCase("function") || lineTable[0].equalsIgnoreCase("subroutine") ){
+                        if( lineTable[0].equalsIgnoreCase("function") || lineTable[0].equalsIgnoreCase("subroutine") 
+                        		|| lineTable[0].equalsIgnoreCase("program") ){
                             methodStartsHere(checkForPreviousEnd,checkForPreviousEndLine,lineTable,1,countLOC);
                         }
                         else if( !lineTable[0].equalsIgnoreCase("end") ){
@@ -170,14 +171,16 @@ public class fortranFile extends CodeFile{
                         
                         // For stop count LOC in function/subroutine
                         if( lineTable[0].equalsIgnoreCase("end") && lineTable.length>1 ){
-                            if( lineTable[1].equalsIgnoreCase("function") || lineTable[1].equalsIgnoreCase("subroutine") ){
+                            if( lineTable[1].equalsIgnoreCase("function") || lineTable[1].equalsIgnoreCase("subroutine") 
+                            		|| lineTable[1].equalsIgnoreCase("program") ){
                                 methodEndsHere(countLOC);
                             }
                             if( arrayDoStart.size()==arrayDoEnd.size() && arrayIfStart.size()==arrayIfEnd.size()){
                                 methodEndsHere(countLOC);
                             }
                         }
-                        else if( lineTable[0].equalsIgnoreCase("endfunction") || lineTable[0].equalsIgnoreCase("endsubroutine")){
+                        else if( lineTable[0].equalsIgnoreCase("endfunction") || lineTable[0].equalsIgnoreCase("endsubroutine")
+                        		|| lineTable[0].equalsIgnoreCase("endprogram") ){
                             methodEndsHere(countLOC);
                         }
                         else if (lineTable[0].equalsIgnoreCase("end") && lineTable.length==1){
@@ -303,7 +306,6 @@ public class fortranFile extends CodeFile{
                                     if(arraySelectCasesEnd.get(i)==0)
                                         casescounter=i;
                                 }
-                                System.out.println(file.getAbsolutePath());
                                 arraySelectCasesEnd.set(casescounter, countLOC);
                             }
                         }
@@ -359,11 +361,6 @@ public class fortranFile extends CodeFile{
             }
             
             
-            //export csv for attributes and invocations
-//            if(module){
-//                new CSVWriteForClustering(this);
-//            }
-            
 //                System.out.println("do");
 //                for(int i=0; i<arrayDoStart.size(); i++){
 //                    System.out.println("start: "+arrayDoStart.get(i)+ " end: "+ arrayDoEnd.get(i));
@@ -383,6 +380,18 @@ public class fortranFile extends CodeFile{
         }
     }
     
+    /**
+     * export csv for attributes and invocations
+     */
+    @Override
+    public boolean exportCSVofAtribute(){
+        if(module){
+            new CSVWriteForClustering(this);
+            return true;
+        }
+        return false;
+    }
+    
      /**
      * Its called to Start the method 
      * @param checkForPreviousEnd to check for previous methods ends
@@ -398,8 +407,10 @@ public class fortranFile extends CodeFile{
         if(methodsLocStop.size() != methodsLocStart.size()){
             methodsLocStop.add(0);
         }
-        String[] methodName= lineTable[nameInt].split("\\(");
-        methodsName.add(methodName[0]);
+        String name= "program";
+        if(lineTable.length>nameInt)
+        	name= lineTable[nameInt].split("\\(")[0];
+        methodsName.add(name);
         methodsLocStart.add(countLOC);
         methodsCCArray.add(0);
     }
@@ -472,7 +483,7 @@ public class fortranFile extends CodeFile{
     }
     
     @Override
-    public void calculateOpportunities(boolean fast){
+    public void calculateOpportunities(boolean fast, String methodName){
         //Deletes previous if exist
         File fileDelPrev = new File("./" + file.getName() + "_parsed.txt");
         if(fileDelPrev.exists())
@@ -498,7 +509,7 @@ public class fortranFile extends CodeFile{
             else
                 lang="f77";
             ParsedFilesController paFC=new ParsedFilesController();
-            this.opportunities = paFC.calculateOpportunities(fast, file, lang, methodsLocDecl);
+            this.opportunities = paFC.calculateOpportunities(fast, file, methodName, lang, methodsLocDecl);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(fortranFile.class.getName()).log(Level.SEVERE, null, ex);
         }
