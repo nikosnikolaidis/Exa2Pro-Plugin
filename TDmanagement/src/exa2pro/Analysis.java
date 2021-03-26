@@ -211,20 +211,20 @@ public class Analysis {
             // Add waiting animation
             
             //files to unix format
-        	if(!Exa2Pro.Dos2UnixPath.equals("")) {
-	            Process proc1 = Runtime.getRuntime().exec("cmd /c \"cd " + project.getCredentials().getProjectDirectory() + " && "+
-	        			Exa2Pro.Dos2UnixPath + " *.*" + "\"");
-	            BufferedReader reader2 = new BufferedReader(new InputStreamReader(proc1.getErrorStream()));
-	            String line2;
-	            while ((line2 = reader2.readLine()) != null) {    
-	                System.out.println(line2);
-	            }
-	            BufferedReader reader1 = new BufferedReader(new InputStreamReader(proc1.getInputStream()));
-	            String line1;
-	            while ((line1 = reader1.readLine()) != null) {    
-	                System.out.println(line1);
-	            }
-        	}
+            if(!Exa2Pro.Dos2UnixPath.equals("")){
+                Process proc1 = Runtime.getRuntime().exec("cmd /c \"cd " + project.getCredentials().getProjectDirectory() + " && "+
+                                    Exa2Pro.Dos2UnixPath + " *.*" + "\"");
+                BufferedReader reader2 = new BufferedReader(new InputStreamReader(proc1.getErrorStream()));
+                String line2;
+                while ((line2 = reader2.readLine()) != null) {    
+                    System.out.println(line2);
+                }
+                BufferedReader reader1 = new BufferedReader(new InputStreamReader(proc1.getInputStream()));
+                String line1;
+                while ((line1 = reader1.readLine()) != null) {    
+                    System.out.println(line1);
+                }
+            }
             
             //analysis
             System.out.println(System.getProperty("user.dir"));
@@ -294,6 +294,36 @@ public class Analysis {
     // Linux
     // runs in terminal sonar-scanner
     private void runAnalysisLinux() {                     
+        //files to unix format
+        try {
+            //add command Strings
+            String[] input = new String[project.getFortranFilesIndexed().size()+2];
+            input[0]= "dos2unix";
+            input[1]= "-o";
+            int countS=2;
+            for(Integer key: project.getFortranFilesIndexed().keySet()){
+                input[countS]= key +"."+ project.getFortranFilesIndexed().get(key).file.getName().split("\\.")
+                            [project.getFortranFilesIndexed().get(key).file.getName().split("\\.").length-1];
+                countS++;
+            }
+            
+            //run process
+            ProcessBuilder pbuilder = new ProcessBuilder( input );
+            File err = new File("err2Unix.txt");
+            pbuilder.redirectError(err);
+            pbuilder.directory(new File(project.getCredentials().getProjectDirectory()));
+            Process p = pbuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            System.out.println("Dos2Unix run");
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //analysis
         try {
             ProcessBuilder pbuilder = new ProcessBuilder("bash", "-c", 
                     "cd '"+project.getCredentials().getProjectDirectory()+"' ; '"+
