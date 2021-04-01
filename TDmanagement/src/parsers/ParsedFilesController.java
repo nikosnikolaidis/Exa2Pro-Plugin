@@ -359,13 +359,24 @@ public class ParsedFilesController {
             fileDel.delete();
         }
         else{
-            fortranFile ffInitial = new fortranFile(new File("./temp_"+file.getName()), true);
-            ffInitial.parse();
-            ffInitial.calculateCohesion();
-            
+        	CodeFile initialFile;
+            switch (language) {
+                case "f90":
+                    initialFile = new fortranFile(new File("./temp_"+file.getName()), true);
+                    break;
+                case "f77":
+                    initialFile = new fortranFile(new File("./temp_"+file.getName()), false);
+                    break;
+                default: //for c
+                    initialFile = new cFile(new File("./temp_"+file.getName()));
+                    break;
+            }
+
+            initialFile.parse();
+            initialFile.calculateCohesion();
             File fileDelInit = new File("./temp_"+file.getName());
             fileDelInit.delete();
-            initialMethodCohesion= ffInitial.cohesion;
+            initialMethodCohesion= initialFile.cohesion;
         }
         
         return initialMethodCohesion;
