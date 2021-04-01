@@ -187,10 +187,10 @@ public class SampleHandler extends AbstractHandler {
 	    	MetricsView.array=p.getprojectFiles();
 	    	//set arrayOverview for overview metrics
 	    	MetricsView.arrayOverview.put("Technical Debt", p.getprojectReport().getTotalDebt());
-	    	MetricsView.arrayOverview.put("Source Code Debt", round.format(p.getprojectReport().getTDPrincipalSourceCodeDebt()) + " €");
-	    	MetricsView.arrayOverview.put("Design Debt", round.format(p.getprojectReport().getTDPrincipalDesignDebt()) + " €");
+	    	MetricsView.arrayOverview.put("Source Code Debt", round.format(p.getprojectReport().getTDPrincipalSourceCodeDebt()) + "  euros");
+	    	MetricsView.arrayOverview.put("Design Debt", round.format(p.getprojectReport().getTDPrincipalDesignDebt()) + "  euros");
 	        if(p.getprojectReport().getTotalTDInterest()!=0)
-	        	MetricsView.arrayOverview.put("TD Interest", round.format(p.getprojectReport().getTotalTDInterest()) + " €");
+	        	MetricsView.arrayOverview.put("TD Interest", round.format(p.getprojectReport().getTotalTDInterest()) + "  euros");
 	        else
 	        	MetricsView.arrayOverview.put("TD Interest", "-");
 	    	MetricsView.arrayOverview.put("Code Smells", p.getprojectReport().getTotalCodeSmells()+"");
