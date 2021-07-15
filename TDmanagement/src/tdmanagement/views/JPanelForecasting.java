@@ -30,7 +30,7 @@ public class JPanelForecasting extends javax.swing.JPanel {
         initComponents();
         
         jPanelFiles.setVisible(false);
-        lineChartForecasting = new LineChartForecasting(10);
+        lineChartForecasting = new LineChartForecasting(project, 10);
         createAndAdd(false);
         
         jSliderHorizon.addChangeListener(new ChangeListener() {
@@ -245,13 +245,13 @@ public class JPanelForecasting extends javax.swing.JPanel {
         if(jButton1.getText().equals("Files/Modules")){
             jPanel1.removeAll();
 
-            lineChartForecasting= new LineChartForecasting(jSliderHorizon.getValue());
+            lineChartForecasting= new LineChartForecasting(project, jSliderHorizon.getValue());
             createAndAdd(false);
         }
         else{
             jPanel1.removeAll();
             
-            bubbleChartForecasting= new BubbleChartForecasting(jSliderHorizon.getValue(), jSliderFiles.getValue());
+            bubbleChartForecasting= new BubbleChartForecasting(project, jSliderHorizon.getValue(), jSliderFiles.getValue());
             createAndAdd(true);
         }
 	repaint();
@@ -268,7 +268,7 @@ public class JPanelForecasting extends javax.swing.JPanel {
             jLabelHorizon.setText("10");
             jSliderFiles.setValue(10);
             jLabelFiles.setText("10");
-            bubbleChartForecasting= new BubbleChartForecasting(jSliderHorizon.getValue(),jSliderFiles.getValue());
+            bubbleChartForecasting= new BubbleChartForecasting(project, jSliderHorizon.getValue(),jSliderFiles.getValue());
             createAndAdd(true);
             repaint();
         }
@@ -280,7 +280,7 @@ public class JPanelForecasting extends javax.swing.JPanel {
             jPanelFiles.setVisible(false);
             jSliderHorizon.setValue(10);
             jLabelHorizon.setText("10");
-            lineChartForecasting= new LineChartForecasting(jSliderHorizon.getValue());
+            lineChartForecasting= new LineChartForecasting(project, jSliderHorizon.getValue());
             createAndAdd(false);
             repaint();
         }
@@ -289,7 +289,7 @@ public class JPanelForecasting extends javax.swing.JPanel {
     private void jSliderFilesMouseReleased(java.awt.event.MouseEvent evt) {                                           
         jPanel1.removeAll();
         
-        bubbleChartForecasting= new BubbleChartForecasting(jSliderHorizon.getValue(),jSliderFiles.getValue());
+        bubbleChartForecasting= new BubbleChartForecasting(project, jSliderHorizon.getValue(),jSliderFiles.getValue());
         createAndAdd(true);
 	repaint();
     }                                          
