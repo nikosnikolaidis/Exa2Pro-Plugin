@@ -274,13 +274,13 @@ public class Analysis {
      * Formats the Technical Debt from number to string with days, hours or minutes
      * @param dept the total debt in minutes
      */
-    private String formatTehnicalDebt(double dept) {
+    public String formatTehnicalDebt(double dept) {
         String str = "";
         DecimalFormat df = new DecimalFormat("#.#");
         if (dept > 59) {
             dept = dept / 60;
         } else {
-            str = "min";
+        	return Double.parseDouble(df.format(dept)) + "min";
         }
         if (dept > 7) {
             dept = dept / 8;
